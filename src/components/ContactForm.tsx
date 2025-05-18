@@ -1,10 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
+import emailjs from '@emailjs/browser';
+
+// EmailJS configuration constants
+const EMAILJS_SERVICE_ID = 'service_vavsskp';
+const EMAILJS_TEMPLATE_ID = 'template_2kd2n3r';
+const EMAILJS_PUBLIC_KEY = 'gIFZN3uJWbJjIIXwC';
 
 const ContactForm = () => {
   const { toast } = useToast();
@@ -14,23 +20,39 @@ const ContactForm = () => {
     { sender: 'admin', content: "Hi there! 👋 I'm available to chat. Feel free to send me a message and I'll get back to you soon!" }
   ]);
   const [messageInput, setMessageInput] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
   
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Message sent!",
-        description: "Thanks for reaching out. I'll get back to you soon.",
+    // Initialize EmailJS
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    
+    // Get form data
+    const form = e.target as HTMLFormElement;
+    
+    // Send email using EmailJS
+    emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
+      .then(() => {
+        toast({
+          title: "Message sent!",
+          description: "Thanks for reaching out. I'll get back to you soon.",
+        });
+        
+        // Reset form
+        form.reset();
+        setIsSubmitting(false);
+      })
+      .catch((error) => {
+        console.error('Email sending failed:', error);
+        toast({
+          title: "Message failed to send",
+          description: "There was a problem sending your message. Please try again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
       });
-      
-      // Reset form
-      const form = e.target as HTMLFormElement;
-      form.reset();
-    }, 1000);
   };
 
   const handleSendChatMessage = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,16 +63,38 @@ const ContactForm = () => {
     // Add user message
     setChatMessages(prev => [...prev, { sender: 'user', content: messageInput }]);
     
+    // Prepare email data for chat message
+    const emailData = {
+      from_name: 'Chat User',
+      message: messageInput,
+      reply_to: 'chat@user.com',
+    };
+    
     // Clear input
     setMessageInput('');
     
-    // Simulate response after a short delay
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { 
-        sender: 'admin', 
-        content: "Thanks for your message! I'll get back to you as soon as possible." 
-      }]);
-    }, 1000);
+    // Initialize EmailJS
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    
+    // Send email using EmailJS
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailData)
+      .then(() => {
+        // Email sent successfully, add simulated response
+        setTimeout(() => {
+          setChatMessages(prev => [...prev, { 
+            sender: 'admin', 
+            content: "Thanks for your message! I'll get back to you as soon as possible." 
+          }]);
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error('Chat message email failed:', error);
+        // Still show the message in UI even if email fails
+        setChatMessages(prev => [...prev, { 
+          sender: 'admin', 
+          content: "Thanks for your message! I'll get back to you as soon as possible." 
+        }]);
+      });
   };
 
   if (isChatMode) {
@@ -95,7 +139,7 @@ const ContactForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="font-medium">Contact Form</h3>
         <div className="flex items-center space-x-2">
@@ -110,21 +154,23 @@ const ContactForm = () => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium">
+          <label htmlFor="from_name" className="text-sm font-medium">
             Your Name
           </label>
           <Input
-            id="name"
+            id="from_name"
+            name="from_name"
             placeholder="John Doe"
             required
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium">
+          <label htmlFor="reply_to" className="text-sm font-medium">
             Email Address
           </label>
           <Input
-            id="email"
+            id="reply_to"
+            name="reply_to"
             type="email"
             placeholder="john@example.com"
             required
@@ -138,6 +184,7 @@ const ContactForm = () => {
         </label>
         <Input
           id="subject"
+          name="subject"
           placeholder="Project Inquiry"
           required
         />
@@ -149,6 +196,7 @@ const ContactForm = () => {
         </label>
         <Textarea
           id="message"
+          name="message"
           placeholder="Tell me about your project, timeline, and budget..."
           rows={6}
           required
