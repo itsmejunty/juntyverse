@@ -4,63 +4,81 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const Hero = () => {
   return (
     <section className="min-h-screen pt-32 pb-16 relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
-        <div className="flex flex-col items-start space-y-8 max-w-3xl">
-          <Badge variant="outline" className="animate-fade-in py-2 px-4 gap-2 text-sm bg-primary/20 border-primary/30 backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-            </span>
-            Available for new opportunities
-          </Badge>
-          
-          <div className="space-y-3">
-            <h1 className="font-bold text-5xl md:text-7xl leading-tight tracking-tight">
-              Hey, I'm <span className="text-gradient-name inline-block relative">
-                Jadidya
-                <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-accent/60 to-primary/40 rounded-full"></span>
+        <div className="flex flex-col md:flex-row items-center gap-8 max-w-5xl mx-auto">
+          {/* Photo Block */}
+          <div className="relative mb-8 md:mb-0 order-1 md:order-2 animate-fade-in">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50 rounded-full blur-xl opacity-70 animate-pulse"></div>
+            <Avatar className="w-48 h-48 border-4 border-white shadow-xl">
+              <AvatarImage 
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=300" 
+                alt="Jadidya" 
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-gradient-to-br from-primary/30 to-accent/30 text-3xl font-bold">
+                JD
+              </AvatarFallback>
+            </Avatar>
+          </div>
+
+          <div className="flex flex-col items-start space-y-8 max-w-3xl order-2 md:order-1">
+            <Badge variant="outline" className="animate-fade-in py-2 px-4 gap-2 text-sm bg-primary/20 border-primary/30 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
               </span>
-            </h1>
+              Available for new opportunities
+            </Badge>
             
-            <h2 className="text-3xl md:text-5xl font-light text-foreground/90">
-              Front-end & <span className="text-accent">Full-Stack</span> Developer
-            </h2>
-          </div>
-          
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-            A recent B.Tech graduate in Computer Science specializing in building 
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-medium"> modern web applications </span> 
-            using React and Node.js. I create elegant solutions that prioritize user experience and clean code.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 pt-6">
-            <Link to="/projects">
-              <Button size="lg" className="group relative overflow-hidden transition-all duration-300 px-8 bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-accent/20">
-                <span className="relative z-10 flex items-center gap-2">
-                  View my projects
-                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+            <div className="space-y-3">
+              <h1 className="font-bold text-5xl md:text-7xl leading-tight tracking-tight">
+                Hey, I'm <span className="text-gradient-name inline-block relative">
+                  Jadidya
+                  <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-accent/60 to-primary/40 rounded-full"></span>
                 </span>
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="group border-primary/30 hover:border-accent px-8 hover:shadow-lg hover:shadow-primary/20">
-                <span className="flex items-center gap-2">
-                  Get in touch
-                  <Sparkles className="h-4 w-4" />
-                </span>
-              </Button>
-            </Link>
+              </h1>
+              
+              <h2 className="text-3xl md:text-5xl font-light text-foreground/90">
+                Front-end & <span className="text-accent">Full-Stack</span> Developer
+              </h2>
+            </div>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
+              A recent B.Tech graduate in Computer Science specializing in building 
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-medium"> modern web applications </span> 
+              using React and Node.js. I create elegant solutions that prioritize user experience and clean code.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <Link to="/projects">
+                <Button size="lg" className="group relative overflow-hidden transition-all duration-300 px-8 bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-accent/20">
+                  <span className="relative z-10 flex items-center gap-2">
+                    View my projects
+                    <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button size="lg" variant="outline" className="group border-primary/30 hover:border-accent px-8 hover:shadow-lg hover:shadow-primary/20">
+                  <span className="flex items-center gap-2">
+                    Get in touch
+                    <Sparkles className="h-4 w-4" />
+                  </span>
+                </Button>
+              </Link>
+            </div>
           </div>
+        </div>
           
-          {/* Scrolling indicator */}
-          <div className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center animate-bounce">
-            <span className="text-sm text-accent mb-2">Scroll to explore</span>
-            <ArrowRight className="rotate-90 w-4 h-4 text-accent" />
-          </div>
+        {/* Scrolling indicator */}
+        <div className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center animate-bounce">
+          <span className="text-sm text-accent mb-2">Scroll to explore</span>
+          <ArrowRight className="rotate-90 w-4 h-4 text-accent" />
         </div>
       </div>
       
