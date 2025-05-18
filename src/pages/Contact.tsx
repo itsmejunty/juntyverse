@@ -74,7 +74,7 @@ const Contact = () => {
               <div className="mt-12">
                 <h2 className="text-2xl font-semibold mb-6">Response Time</h2>
                 <p className="text-muted-foreground">
-                  I typically respond to all messages within 24-48 hours. For urgent inquiries, please mention that in the subject line.
+                  I typically respond to all messages within 24-48 hours. For urgent inquiries, please mention that in the subject line or use the chat mode for quicker responses.
                 </p>
               </div>
             </div>
