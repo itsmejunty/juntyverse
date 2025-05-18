@@ -16,7 +16,7 @@ const Hero = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50 rounded-full blur-xl opacity-70 animate-pulse"></div>
             <Avatar className="w-48 h-48 border-4 border-white shadow-xl">
               <AvatarImage 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=300" 
+                src="https://i.postimg.cc/rw0cR7KB/Whats-App-Image-2025-05-18-at-1-22-49-PM.jpg" 
                 alt="Jadidya" 
                 className="object-cover"
               />
