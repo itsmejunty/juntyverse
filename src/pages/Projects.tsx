@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
 
@@ -10,7 +9,7 @@ const Projects = () => {
       image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?auto=format&fit=crop&q=80&w=1974",
       technologies: ["React", "JavaScript", "CSS", "OpenWeatherMap API"],
       githubUrl: "https://github.com/",
-      liveUrl: "#"
+      liveUrl: "/demo/weather"
     },
     {
       title: "Personal Portfolio Website",
@@ -18,21 +17,23 @@ const Projects = () => {
       image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=2036",
       technologies: ["HTML", "CSS", "JavaScript", "React"],
       githubUrl: "https://github.com/",
-      liveUrl: "#"
+      liveUrl: "/"
     },
     {
       title: "Task Management App",
       description: "A full-stack application for managing tasks and projects. Features include task creation, assignment, status tracking, and team collaboration tools.",
       image: "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?auto=format&fit=crop&q=80&w=2070",
       technologies: ["React", "Node.js", "Express", "MongoDB"],
-      githubUrl: "https://github.com/"
+      githubUrl: "https://github.com/",
+      liveUrl: "/demo/tasks"
     },
     {
       title: "E-commerce Store",
       description: "A fictional e-commerce platform with product listings, shopping cart, and checkout process. Integrated with mock payment processing and order management.",
       image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=2070",
       technologies: ["React", "Redux", "CSS", "Firebase"],
-      githubUrl: "https://github.com/"
+      githubUrl: "https://github.com/",
+      liveUrl: "/demo/ecommerce"
     }
   ];
 

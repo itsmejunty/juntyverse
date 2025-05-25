@@ -14,7 +14,7 @@ const projects: ProjectCardProps[] = [
     image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?auto=format&fit=crop&q=80&w=1974",
     technologies: ["React", "JavaScript", "CSS", "APIs"],
     githubUrl: "https://github.com/",
-    liveUrl: "#"
+    liveUrl: "/demo/weather"
   },
   {
     title: "Personal Portfolio Website",
@@ -22,7 +22,7 @@ const projects: ProjectCardProps[] = [
     image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=2036",
     technologies: ["HTML", "CSS", "JavaScript", "React"],
     githubUrl: "https://github.com/",
-    liveUrl: "#"
+    liveUrl: "/"
   }
 ];
 
