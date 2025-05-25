@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export interface ProjectCardProps {
   title: string;
@@ -46,12 +47,12 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
           </a>
         )}
         {liveUrl && (
-          <a href={liveUrl} target="_blank" rel="noopener noreferrer">
+          <Link to={liveUrl}>
             <Button size="sm" className="group">
               Live Demo
               <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Button>
-          </a>
+          </Link>
         )}
       </CardFooter>
     </Card>

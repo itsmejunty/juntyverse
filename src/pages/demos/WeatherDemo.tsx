@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Cloud, Sun, CloudRain, Snow, Wind, Thermometer, Eye, Droplets } from 'lucide-react';
+import { Cloud, Sun, CloudRain, CloudSnow, Wind, Thermometer, Eye, Droplets } from 'lucide-react';
 
 const WeatherDemo = () => {
   const [city, setCity] = useState('New York');
@@ -27,7 +27,7 @@ const WeatherDemo = () => {
       case 'sunny': return <Sun className="w-8 h-8 text-yellow-500" />;
       case 'cloudy': return <Cloud className="w-8 h-8 text-gray-500" />;
       case 'rainy': return <CloudRain className="w-8 h-8 text-blue-500" />;
-      case 'snowy': return <Snow className="w-8 h-8 text-blue-200" />;
+      case 'snowy': return <CloudSnow className="w-8 h-8 text-blue-200" />;
       default: return <Sun className="w-8 h-8 text-yellow-500" />;
     }
   };
@@ -38,7 +38,8 @@ const WeatherDemo = () => {
       'london': { temperature: 15, condition: 'cloudy', humidity: 80, windSpeed: 8 },
       'tokyo': { temperature: 25, condition: 'sunny', humidity: 55, windSpeed: 5 },
       'paris': { temperature: 18, condition: 'rainy', humidity: 75, windSpeed: 10 },
-      'sydney': { temperature: 28, condition: 'sunny', humidity: 60, windSpeed: 15 }
+      'sydney': { temperature: 28, condition: 'sunny', humidity: 60, windSpeed: 15 },
+      'moscow': { temperature: -5, condition: 'snowy', humidity: 90, windSpeed: 12 }
     };
 
     const cityData = mockData[city.toLowerCase()] || weatherData;
@@ -49,10 +50,10 @@ const WeatherDemo = () => {
     <main className="min-h-screen pt-32 pb-16 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-8 text-center">Weather Dashboard</h1>
+          <h1 className="text-4xl font-bold text-white mb-8 text-center animate-fade-in">Weather Dashboard</h1>
           
           {/* Search Section */}
-          <Card className="mb-8 bg-white/90 backdrop-blur-sm">
+          <Card className="mb-8 bg-white/90 backdrop-blur-sm transform hover:scale-105 transition-all duration-300">
             <CardHeader>
               <CardTitle>Search Location</CardTitle>
             </CardHeader>
@@ -63,8 +64,9 @@ const WeatherDemo = () => {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                <Button onClick={handleSearch} className="bg-blue-500 hover:bg-blue-600">
+                <Button onClick={handleSearch} className="bg-blue-500 hover:bg-blue-600 hover:scale-105 transition-all duration-300">
                   Search
                 </Button>
               </div>
@@ -72,7 +74,7 @@ const WeatherDemo = () => {
           </Card>
 
           {/* Current Weather */}
-          <Card className="mb-8 bg-white/90 backdrop-blur-sm">
+          <Card className="mb-8 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {getWeatherIcon(weatherData.condition)}
@@ -81,22 +83,22 @@ const WeatherDemo = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
+                <div className="text-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
                   <Thermometer className="w-6 h-6 mx-auto mb-2 text-red-500" />
                   <p className="text-2xl font-bold">{weatherData.temperature}°C</p>
                   <p className="text-sm text-gray-600">Temperature</p>
                 </div>
-                <div className="text-center">
+                <div className="text-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                   <Droplets className="w-6 h-6 mx-auto mb-2 text-blue-500" />
                   <p className="text-2xl font-bold">{weatherData.humidity}%</p>
                   <p className="text-sm text-gray-600">Humidity</p>
                 </div>
-                <div className="text-center">
+                <div className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <Wind className="w-6 h-6 mx-auto mb-2 text-gray-500" />
                   <p className="text-2xl font-bold">{weatherData.windSpeed} km/h</p>
                   <p className="text-sm text-gray-600">Wind Speed</p>
                 </div>
-                <div className="text-center">
+                <div className="text-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                   <Eye className="w-6 h-6 mx-auto mb-2 text-green-500" />
                   <p className="text-2xl font-bold">{weatherData.visibility} km</p>
                   <p className="text-sm text-gray-600">Visibility</p>
@@ -106,14 +108,14 @@ const WeatherDemo = () => {
           </Card>
 
           {/* 5-Day Forecast */}
-          <Card className="bg-white/90 backdrop-blur-sm">
+          <Card className="bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle>5-Day Forecast</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-5 gap-4">
                 {weatherData.forecast.map((day, index) => (
-                  <div key={index} className="text-center p-4 rounded-lg bg-gray-50">
+                  <div key={index} className="text-center p-4 rounded-lg bg-gray-50 hover:bg-gray-100 hover:scale-105 transition-all duration-300">
                     <p className="font-semibold mb-2">{day.day}</p>
                     {getWeatherIcon(day.condition)}
                     <p className="text-lg font-bold mt-2">{day.temp}°C</p>
