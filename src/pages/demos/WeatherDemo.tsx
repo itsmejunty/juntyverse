@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Cloud, Sun, CloudRain, CloudSnow, Wind, Thermometer, Eye, Droplets, Loader2, MapPin, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
+import { Cloud, Sun, CloudRain, CloudSnow, Wind, Thermometer, Eye, Droplets, Loader2, MapPin, Navigation, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import CitySuggestions from '@/components/CitySuggestions';
+import ApiKeyConfig from '@/components/ApiKeyConfig';
 import { useToast } from '@/hooks/use-toast';
+import { indianCitiesDatabase, getIndianCitySuggestions } from '@/data/indianCities';
 
 interface WeatherData {
   temperature: number;
@@ -50,11 +52,20 @@ const WeatherDemo = () => {
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [showAllForecast, setShowAllForecast] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [isLiveDataMode, setIsLiveDataMode] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsTimeoutRef = useRef<NodeJS.Timeout>();
   const { toast } = useToast();
 
-  const API_KEY = 'b8e2b2f5a5c8e4d9f7a6b2e3d4c5a6b7c'; // Demo API key
+  // Load API key from localStorage on mount
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('weather_api_key');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+      setIsLiveDataMode(true);
+    }
+  }, []);
 
   // Comprehensive global cities database
   const globalCitiesDatabase: CityData[] = [
@@ -154,38 +165,77 @@ const WeatherDemo = () => {
     console.log('Fetching suggestions for:', query);
     
     try {
-      // First try the real API
-      const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
-      );
+      // Prioritize Indian cities for better user experience
+      const indianSuggestions = getIndianCitySuggestions(query);
+      
+      if (isLiveDataMode && apiKey) {
+        // Try real API for additional suggestions
+        const response = await fetch(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`
+        );
 
-      if (response.ok) {
-        const data = await response.json();
-        const formattedSuggestions: CityData[] = data.map((item: any) => ({
-          name: item.name,
-          country: item.country,
-          state: item.state,
-          lat: item.lat,
-          lon: item.lon
-        }));
-        setSuggestions(formattedSuggestions);
-        setShowSuggestions(formattedSuggestions.length > 0);
-        console.log('API suggestions loaded:', formattedSuggestions.length);
+        if (response.ok) {
+          const data = await response.json();
+          const apiSuggestions: CityData[] = data.map((item: any) => ({
+            name: item.name,
+            country: item.country,
+            state: item.state,
+            lat: item.lat,
+            lon: item.lon
+          }));
+          
+          // Combine Indian cities with API suggestions, removing duplicates
+          const combinedSuggestions = [...indianSuggestions];
+          apiSuggestions.forEach(apiSugg => {
+            if (!combinedSuggestions.find(indian => 
+              indian.name.toLowerCase() === apiSugg.name.toLowerCase() && 
+              indian.country === apiSugg.country
+            )) {
+              combinedSuggestions.push(apiSugg);
+            }
+          });
+          
+          setSuggestions(combinedSuggestions.slice(0, 8));
+          setShowSuggestions(combinedSuggestions.length > 0);
+          console.log('Combined suggestions loaded:', combinedSuggestions.length);
+        } else {
+          throw new Error('API unavailable');
+        }
       } else {
-        throw new Error('API unavailable');
+        // Use enhanced local database including comprehensive Indian cities
+        const globalSuggestions = globalCitiesDatabase.filter(city => 
+          city.name.toLowerCase().includes(query.toLowerCase()) ||
+          (city.state && city.state.toLowerCase().includes(query.toLowerCase())) ||
+          city.country.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        const combinedSuggestions = [...indianSuggestions, ...globalSuggestions]
+          .filter((city, index, self) => 
+            index === self.findIndex(c => c.name === city.name && c.country === city.country)
+          )
+          .slice(0, 8);
+        
+        setSuggestions(combinedSuggestions);
+        setShowSuggestions(combinedSuggestions.length > 0);
+        console.log('Enhanced local suggestions loaded:', combinedSuggestions.length);
       }
     } catch (error) {
       console.log('Using enhanced local database for suggestions');
-      // Use enhanced local database
-      const filteredSuggestions = globalCitiesDatabase.filter(city => 
+      const indianSuggestions = getIndianCitySuggestions(query);
+      const globalSuggestions = globalCitiesDatabase.filter(city => 
         city.name.toLowerCase().includes(query.toLowerCase()) ||
-        (city.state && city.state.toLowerCase().includes(query.toLowerCase())) ||
-        city.country.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8); // Show more suggestions
+        (city.state && city.state.toLowerCase().includes(query.toLowerCase()))
+      );
       
-      setSuggestions(filteredSuggestions);
-      setShowSuggestions(filteredSuggestions.length > 0);
-      console.log('Local suggestions loaded:', filteredSuggestions.length);
+      const combinedSuggestions = [...indianSuggestions, ...globalSuggestions]
+        .filter((city, index, self) => 
+          index === self.findIndex(c => c.name === city.name && c.country === city.country)
+        )
+        .slice(0, 8);
+      
+      setSuggestions(combinedSuggestions);
+      setShowSuggestions(combinedSuggestions.length > 0);
+      console.log('Fallback suggestions loaded:', combinedSuggestions.length);
     } finally {
       setSuggestionsLoading(false);
     }
@@ -340,7 +390,7 @@ const WeatherDemo = () => {
         minDistance = distance;
         nearestCity = city;
       }
-    });
+    };
     
     return getRealisticWeatherData(nearestCity.name, nearestCity.country);
   };
@@ -351,22 +401,30 @@ const WeatherDemo = () => {
     console.log('Fetching weather data for:', cityName, coordinates);
     
     try {
+      if (!isLiveDataMode || !apiKey) {
+        console.log('Using demo data - no valid API key');
+        const demoData = getRealisticWeatherData(cityName);
+        setWeatherData(demoData);
+        setError('Demo mode: Configure API key above for live weather data');
+        return;
+      }
+
       let currentWeatherResponse;
       let forecastResponse;
 
       if (coordinates) {
         currentWeatherResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${API_KEY}&units=metric`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}&units=metric`
         );
         forecastResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${API_KEY}&units=metric`
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${apiKey}&units=metric`
         );
       } else {
         currentWeatherResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityName)}&appid=${API_KEY}&units=metric`
+          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityName)}&appid=${apiKey}&units=metric`
         );
         forecastResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cityName)}&appid=${API_KEY}&units=metric`
+          `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cityName)}&appid=${apiKey}&units=metric`
         );
       }
       
@@ -374,15 +432,8 @@ const WeatherDemo = () => {
         if (currentWeatherResponse.status === 404) {
           throw new Error('City not found. Please check the spelling and try again.');
         } else if (currentWeatherResponse.status === 401) {
-          console.log('Using demo data due to API limitations');
-          const demoData = getRealisticWeatherData(cityName);
-          setWeatherData(demoData);
-          setError('Using demo data. For live data, a valid API key is required.');
-          toast({
-            title: "Demo Mode",
-            description: "Showing demo weather data",
-          });
-          return;
+          setIsLiveDataMode(false);
+          throw new Error('Invalid API key. Please check your OpenWeatherMap API key.');
         } else {
           throw new Error('Failed to fetch weather data. Please try again.');
         }
@@ -410,18 +461,20 @@ const WeatherDemo = () => {
       };
 
       setWeatherData(processedData);
+      setError(''); // Clear any previous errors
       toast({
-        title: "Weather Updated",
-        description: `Weather data loaded for ${processedData.cityName}`,
+        title: "Live Weather Data",
+        description: `Current weather loaded for ${processedData.cityName}`,
       });
     } catch (err) {
       console.error('Weather API error:', err);
       const demoData = getRealisticWeatherData(cityName);
       setWeatherData(demoData);
-      setError('Using demo data. For live data, a valid API key is required.');
+      setError(err instanceof Error ? err.message : 'Using demo data. Configure API key for live data.');
       toast({
-        title: "Demo Mode",
-        description: "Showing demo weather data",
+        title: isLiveDataMode ? "API Error" : "Demo Mode",
+        description: isLiveDataMode ? "Showing demo data due to API error" : "Configure API key for live data",
+        variant: isLiveDataMode ? "destructive" : "default",
       });
     } finally {
       setLoading(false);
@@ -542,9 +595,20 @@ const WeatherDemo = () => {
     }
   };
 
+  const handleApiKeyChange = (newApiKey: string) => {
+    setApiKey(newApiKey);
+    setIsLiveDataMode(!!newApiKey);
+    setError('');
+    
+    if (newApiKey && weatherData) {
+      // Refresh current weather data with new API key
+      fetchWeatherData(weatherData.cityName);
+    }
+  };
+
   useEffect(() => {
     console.log('WeatherDemo component mounted');
-    fetchWeatherData('London');
+    fetchWeatherData('Mumbai'); // Default to Mumbai for Indian users
   }, []);
 
   useEffect(() => {
@@ -561,24 +625,50 @@ const WeatherDemo = () => {
   }, []);
 
   return (
-    <main className="min-h-screen pt-32 pb-16 bg-gradient-to-br from-purple-400 via-purple-500 to-violet-600">
+    <main className="min-h-screen pt-32 pb-16 bg-gradient-to-br from-purple-400 via-purple-500 to-violet-600 animate-gradient">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-8 text-center animate-fade-in">Live Weather Dashboard</h1>
+          <div className="text-center mb-8 animate-fade-in">
+            <h1 className="text-5xl font-bold text-white mb-4 text-gradient-purple animate-bounce-in">
+              <Sparkles className="inline w-12 h-12 mr-4 animate-pulse-glow" />
+              Live Weather Dashboard
+              <Sparkles className="inline w-12 h-12 ml-4 animate-pulse-glow" />
+            </h1>
+            <p className="text-xl text-purple-100 animate-slide-up">
+              Get real-time weather data with comprehensive Indian city coverage
+            </p>
+          </div>
           
-          <Card className="mb-8 glass-effect border-purple-200 transform hover:scale-105 transition-all duration-300 purple-glow">
+          <div className="mb-8 animate-slide-up">
+            <ApiKeyConfig 
+              onApiKeyChange={handleApiKeyChange} 
+              currentApiKey={apiKey}
+            />
+          </div>
+          
+          <Card className="mb-8 glass-effect border-purple-200 transform hover:scale-105 transition-all duration-500 purple-glow animate-float">
             <CardHeader>
-              <CardTitle className="text-purple-800">Search Location</CardTitle>
-              <CardDescription>Get real-time weather data for any city worldwide (Global coverage with smart suggestions)</CardDescription>
+              <CardTitle className="text-purple-800 flex items-center gap-2">
+                <MapPin className="w-6 h-6 animate-pulse" />
+                Search Location
+                {isLiveDataMode && (
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full animate-pulse-glow">
+                    LIVE DATA
+                  </span>
+                )}
+              </CardTitle>
+              <CardDescription>
+                Search from {indianCitiesDatabase.length}+ Indian cities and global locations with smart suggestions
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex gap-4 mb-4">
                 <div className="flex-1 relative" ref={inputRef}>
                   <Input
-                    placeholder="Search any city globally (e.g., London, Paris, Tokyo, Hyderabad, Jaipur, Dubai)..."
+                    placeholder="Search any Indian city (Mumbai, Delhi, Bangalore) or global location..."
                     value={city}
                     onChange={handleCityInputChange}
-                    className="border-purple-200 focus:border-purple-400"
+                    className="border-purple-200 focus:border-purple-400 transition-all duration-300 animate-shimmer"
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     disabled={loading}
                     onFocus={() => {
@@ -597,7 +687,7 @@ const WeatherDemo = () => {
                 </div>
                 <Button 
                   onClick={handleSearch} 
-                  className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 hover:scale-110 transition-all duration-300 animate-pulse-glow"
                   disabled={loading}
                 >
                   {loading ? (
@@ -612,7 +702,7 @@ const WeatherDemo = () => {
                 <Button
                   onClick={getCurrentLocation}
                   variant="outline"
-                  className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:scale-105 transition-all duration-300"
+                  className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:scale-110 transition-all duration-300"
                   disabled={gpsLoading}
                 >
                   {gpsLoading ? (
@@ -628,70 +718,94 @@ const WeatherDemo = () => {
                   )}
                 </Button>
               </div>
-              {error && (
-                <p className="text-orange-600 mt-2 text-sm bg-orange-50 p-2 rounded">{error}</p>
+              {error && !isLiveDataMode && (
+                <p className="text-blue-600 mt-2 text-sm bg-blue-50 p-3 rounded-lg border border-blue-200 animate-fade-in">
+                  <Sparkles className="w-4 h-4 inline mr-2" />
+                  {error}
+                </p>
+              )}
+              {error && isLiveDataMode && (
+                <p className="text-orange-600 mt-2 text-sm bg-orange-50 p-3 rounded-lg border border-orange-200 animate-fade-in">
+                  {error}
+                </p>
               )}
             </CardContent>
           </Card>
 
           {weatherData && (
             <>
-              <Card className="mb-8 glass-effect border-purple-200 hover:shadow-xl hover:shadow-purple-200/30 transition-all duration-300">
+              <Card className="mb-8 glass-effect border-purple-200 hover:shadow-2xl hover:shadow-purple-200/40 transition-all duration-500 animate-bounce-in">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3 text-purple-800">
-                    {getWeatherIcon(weatherData.condition)}
+                    <div className="animate-float">
+                      {getWeatherIcon(weatherData.condition)}
+                    </div>
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-purple-600" />
+                      <MapPin className="w-5 h-5 text-purple-600 animate-pulse" />
                       Current Weather in {weatherData.cityName}, {weatherData.country}
+                      {isLiveDataMode && (
+                        <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full animate-pulse-glow">
+                          LIVE
+                        </span>
+                      )}
                     </div>
                   </CardTitle>
-                  <CardDescription className="text-lg capitalize text-purple-600">{weatherData.description}</CardDescription>
+                  <CardDescription className="text-lg capitalize text-purple-600 animate-fade-in">
+                    {weatherData.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                    <div className="text-center p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl hover:shadow-lg transition-all duration-300 border border-red-100">
-                      <Thermometer className="w-8 h-8 mx-auto mb-3 text-red-500" />
+                    <div className="text-center p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-red-100 animate-bounce-in">
+                      <Thermometer className="w-8 h-8 mx-auto mb-3 text-red-500 animate-pulse" />
                       <p className="text-3xl font-bold text-red-600">{weatherData.temperature}°C</p>
                       <p className="text-sm text-gray-600 mt-1">Temperature</p>
                       <p className="text-xs text-gray-500">Feels like {weatherData.feels_like}°C</p>
                     </div>
-                    <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl hover:shadow-lg transition-all duration-300 border border-blue-100">
-                      <Droplets className="w-8 h-8 mx-auto mb-3 text-blue-500" />
+                    <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-blue-100 animate-bounce-in" style={{animationDelay: '0.1s'}}>
+                      <Droplets className="w-8 h-8 mx-auto mb-3 text-blue-500 animate-pulse" />
                       <p className="text-3xl font-bold text-blue-600">{weatherData.humidity}%</p>
                       <p className="text-sm text-gray-600 mt-1">Humidity</p>
                     </div>
-                    <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl hover:shadow-lg transition-all duration-300 border border-gray-100">
-                      <Wind className="w-8 h-8 mx-auto mb-3 text-gray-500" />
+                    <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-gray-100 animate-bounce-in" style={{animationDelay: '0.2s'}}>
+                      <Wind className="w-8 h-8 mx-auto mb-3 text-gray-500 animate-pulse" />
                       <p className="text-3xl font-bold text-gray-600">{weatherData.windSpeed} km/h</p>
                       <p className="text-sm text-gray-600 mt-1">Wind Speed</p>
                     </div>
-                    <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl hover:shadow-lg transition-all duration-300 border border-green-100">
-                      <Eye className="w-8 h-8 mx-auto mb-3 text-green-500" />
+                    <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-green-100 animate-bounce-in" style={{animationDelay: '0.3s'}}>
+                      <Eye className="w-8 h-8 mx-auto mb-3 text-green-500 animate-pulse" />
                       <p className="text-3xl font-bold text-green-600">{weatherData.visibility} km</p>
                       <p className="text-sm text-gray-600 mt-1">Visibility</p>
                     </div>
                   </div>
                   
-                  <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border border-purple-100">
+                  <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border border-purple-100 animate-fade-in hover:shadow-lg transition-all duration-300">
                     <p className="text-sm text-gray-600 mb-1">Atmospheric Pressure</p>
                     <p className="text-2xl font-bold text-purple-600">{weatherData.pressure} hPa</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="glass-effect border-purple-200 hover:shadow-xl hover:shadow-purple-200/30 transition-all duration-300">
+              <Card className="glass-effect border-purple-200 hover:shadow-2xl hover:shadow-purple-200/40 transition-all duration-500 animate-slide-up">
                 <CardHeader>
-                  <CardTitle className="text-purple-800">Weather Forecast</CardTitle>
+                  <CardTitle className="text-purple-800 flex items-center gap-2">
+                    <Cloud className="w-6 h-6 animate-float" />
+                    Weather Forecast
+                  </CardTitle>
                   <CardDescription>Detailed weather outlook for the coming days</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     {weatherData.forecast.slice(0, showAllForecast ? weatherData.forecast.length : 3).map((day, index) => (
-                      <div key={index} className="p-6 rounded-xl bg-gradient-to-br from-gray-50 to-purple-50 hover:from-purple-50 hover:to-violet-100 hover:scale-105 transition-all duration-300 border border-purple-100">
+                      <div 
+                        key={index} 
+                        className="p-6 rounded-xl bg-gradient-to-br from-gray-50 to-purple-50 hover:from-purple-50 hover:to-violet-100 hover:scale-105 transition-all duration-300 border border-purple-100 animate-bounce-in"
+                        style={{animationDelay: `${index * 0.1}s`}}
+                      >
                         <div className="text-center">
                           <p className="font-semibold mb-2 text-purple-700">{day.day}</p>
                           <p className="text-sm text-gray-600 mb-3">{day.date}</p>
-                          <div className="flex justify-center mb-3">
+                          <div className="flex justify-center mb-3 animate-float">
                             {getWeatherIcon(day.condition)}
                           </div>
                           <div className="space-y-2">
@@ -723,7 +837,7 @@ const WeatherDemo = () => {
                       <Button
                         onClick={() => setShowAllForecast(!showAllForecast)}
                         variant="outline"
-                        className="border-purple-300 text-purple-700 hover:bg-purple-50 transition-all duration-300"
+                        className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:scale-105 transition-all duration-300 animate-pulse-glow"
                       >
                         {showAllForecast ? (
                           <>
