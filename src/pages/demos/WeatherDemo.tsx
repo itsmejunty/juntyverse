@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -131,12 +132,7 @@ const WeatherDemo = () => {
     { name: 'São Paulo', country: 'BR', lat: -23.5558, lon: -46.6396 },
     { name: 'Rio de Janeiro', country: 'BR', lat: -22.9068, lon: -43.1729 },
     { name: 'Buenos Aires', country: 'AR', lat: -34.6118, lon: -58.3960 },
-    { name: 'Lima', country: 'PE', lat: -12.0464, lon: -77.0428 },
-    
-    // Pakistan duplicates for common searches
-    { name: 'Hyderabad', country: 'PK', state: 'Sindh', lat: 25.3960, lon: 68.3578 },
-    { name: 'London', country: 'CA', state: 'Ontario', lat: 42.9849, lon: -81.2453 },
-    { name: 'Paris', country: 'US', state: 'Texas', lat: 33.6617, lon: -95.5555 }
+    { name: 'Lima', country: 'PE', lat: -12.0464, lon: -77.0428 }
   ];
 
   const getWeatherIcon = (condition: string) => {
@@ -325,7 +321,7 @@ const WeatherDemo = () => {
     try {
       // Get current weather
       const currentWeatherResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
       );
       
       if (!currentWeatherResponse.ok) {
@@ -336,7 +332,7 @@ const WeatherDemo = () => {
       
       // Get forecast data
       const forecastResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
       );
       
       let forecastData = null;
@@ -367,11 +363,6 @@ const WeatherDemo = () => {
       const demoData = getLocationBasedDemoData(lat, lon);
       setWeatherData(demoData);
       setCity(`${demoData.cityName}, ${demoData.country}`);
-      setError('Using demo data. For live data, a valid API key is required.');
-      toast({
-        title: "Demo Mode",
-        description: "Showing demo weather data",
-      });
     } finally {
       setLoading(false);
     }
@@ -390,7 +381,7 @@ const WeatherDemo = () => {
         minDistance = distance;
         nearestCity = city;
       }
-    };
+    });
     
     return getRealisticWeatherData(nearestCity.name, nearestCity.country);
   };
@@ -402,10 +393,9 @@ const WeatherDemo = () => {
     
     try {
       if (!isLiveDataMode || !apiKey) {
-        console.log('Using demo data - no valid API key');
+        console.log('Using local data - no API key configured');
         const demoData = getRealisticWeatherData(cityName);
         setWeatherData(demoData);
-        setError('Demo mode: Configure API key above for live weather data');
         return;
       }
 
@@ -470,12 +460,14 @@ const WeatherDemo = () => {
       console.error('Weather API error:', err);
       const demoData = getRealisticWeatherData(cityName);
       setWeatherData(demoData);
-      setError(err instanceof Error ? err.message : 'Using demo data. Configure API key for live data.');
-      toast({
-        title: isLiveDataMode ? "API Error" : "Demo Mode",
-        description: isLiveDataMode ? "Showing demo data due to API error" : "Configure API key for live data",
-        variant: isLiveDataMode ? "destructive" : "default",
-      });
+      if (isLiveDataMode && err instanceof Error && err.message.includes('API key')) {
+        setError(err.message);
+        toast({
+          title: "API Error",
+          description: err.message,
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -718,13 +710,7 @@ const WeatherDemo = () => {
                   )}
                 </Button>
               </div>
-              {error && !isLiveDataMode && (
-                <p className="text-blue-600 mt-2 text-sm bg-blue-50 p-3 rounded-lg border border-blue-200 animate-fade-in">
-                  <Sparkles className="w-4 h-4 inline mr-2" />
-                  {error}
-                </p>
-              )}
-              {error && isLiveDataMode && (
+              {error && (
                 <p className="text-orange-600 mt-2 text-sm bg-orange-50 p-3 rounded-lg border border-orange-200 animate-fade-in">
                   {error}
                 </p>
