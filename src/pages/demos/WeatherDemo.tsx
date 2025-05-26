@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Cloud, Sun, CloudRain, CloudSnow, Wind, Thermometer, Eye, Droplets, Loader2, MapPin, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
 import CitySuggestions from '@/components/CitySuggestions';
+import { useToast } from '@/hooks/use-toast';
 
 interface WeatherData {
   temperature: number;
@@ -52,8 +52,81 @@ const WeatherDemo = () => {
   const [gpsLoading, setGpsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsTimeoutRef = useRef<NodeJS.Timeout>();
+  const { toast } = useToast();
 
-  const API_KEY = 'b8e2b2f5a5c8e4d9f7a6b2e3d4c5a6b7c'; // More realistic API key format
+  const API_KEY = 'b8e2b2f5a5c8e4d9f7a6b2e3d4c5a6b7c'; // Demo API key
+
+  // Comprehensive global cities database
+  const globalCitiesDatabase: CityData[] = [
+    // India
+    { name: 'Mumbai', country: 'IN', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 },
+    { name: 'Delhi', country: 'IN', state: 'Delhi', lat: 28.7041, lon: 77.1025 },
+    { name: 'Bangalore', country: 'IN', state: 'Karnataka', lat: 12.9716, lon: 77.5946 },
+    { name: 'Hyderabad', country: 'IN', state: 'Telangana', lat: 17.3850, lon: 78.4867 },
+    { name: 'Chennai', country: 'IN', state: 'Tamil Nadu', lat: 13.0827, lon: 80.2707 },
+    { name: 'Kolkata', country: 'IN', state: 'West Bengal', lat: 22.5726, lon: 88.3639 },
+    { name: 'Pune', country: 'IN', state: 'Maharashtra', lat: 18.5204, lon: 73.8567 },
+    { name: 'Ahmedabad', country: 'IN', state: 'Gujarat', lat: 23.0225, lon: 72.5714 },
+    { name: 'Jaipur', country: 'IN', state: 'Rajasthan', lat: 26.9124, lon: 75.7873 },
+    { name: 'Lucknow', country: 'IN', state: 'Uttar Pradesh', lat: 26.8467, lon: 80.9462 },
+    
+    // United States
+    { name: 'New York', country: 'US', state: 'New York', lat: 40.7128, lon: -74.0060 },
+    { name: 'Los Angeles', country: 'US', state: 'California', lat: 34.0522, lon: -118.2437 },
+    { name: 'Chicago', country: 'US', state: 'Illinois', lat: 41.8781, lon: -87.6298 },
+    { name: 'Houston', country: 'US', state: 'Texas', lat: 29.7604, lon: -95.3698 },
+    { name: 'Miami', country: 'US', state: 'Florida', lat: 25.7617, lon: -80.1918 },
+    { name: 'San Francisco', country: 'US', state: 'California', lat: 37.7749, lon: -122.4194 },
+    { name: 'Seattle', country: 'US', state: 'Washington', lat: 47.6062, lon: -122.3321 },
+    { name: 'Boston', country: 'US', state: 'Massachusetts', lat: 42.3601, lon: -71.0589 },
+    
+    // Europe
+    { name: 'London', country: 'GB', state: 'England', lat: 51.5074, lon: -0.1278 },
+    { name: 'Paris', country: 'FR', lat: 48.8566, lon: 2.3522 },
+    { name: 'Berlin', country: 'DE', lat: 52.5200, lon: 13.4050 },
+    { name: 'Madrid', country: 'ES', lat: 40.4168, lon: -3.7038 },
+    { name: 'Rome', country: 'IT', lat: 41.9028, lon: 12.4964 },
+    { name: 'Amsterdam', country: 'NL', lat: 52.3676, lon: 4.9041 },
+    { name: 'Vienna', country: 'AT', lat: 48.2082, lon: 16.3738 },
+    { name: 'Barcelona', country: 'ES', lat: 41.3851, lon: 2.1734 },
+    { name: 'Prague', country: 'CZ', lat: 50.0755, lon: 14.4378 },
+    { name: 'Stockholm', country: 'SE', lat: 59.3293, lon: 18.0686 },
+    
+    // Asia Pacific
+    { name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
+    { name: 'Seoul', country: 'KR', lat: 37.5665, lon: 126.9780 },
+    { name: 'Beijing', country: 'CN', lat: 39.9042, lon: 116.4074 },
+    { name: 'Shanghai', country: 'CN', lat: 31.2304, lon: 121.4737 },
+    { name: 'Singapore', country: 'SG', lat: 1.3521, lon: 103.8198 },
+    { name: 'Bangkok', country: 'TH', lat: 13.7563, lon: 100.5018 },
+    { name: 'Sydney', country: 'AU', state: 'New South Wales', lat: -33.8688, lon: 151.2093 },
+    { name: 'Melbourne', country: 'AU', state: 'Victoria', lat: -37.8136, lon: 144.9631 },
+    { name: 'Hong Kong', country: 'HK', lat: 22.3193, lon: 114.1694 },
+    { name: 'Manila', country: 'PH', lat: 14.5995, lon: 120.9842 },
+    
+    // Middle East & Africa
+    { name: 'Dubai', country: 'AE', lat: 25.2048, lon: 55.2708 },
+    { name: 'Cairo', country: 'EG', lat: 30.0444, lon: 31.2357 },
+    { name: 'Cape Town', country: 'ZA', lat: -33.9249, lon: 18.4241 },
+    { name: 'Tel Aviv', country: 'IL', lat: 32.0853, lon: 34.7818 },
+    { name: 'Istanbul', country: 'TR', lat: 41.0082, lon: 28.9784 },
+    
+    // Canada
+    { name: 'Toronto', country: 'CA', state: 'Ontario', lat: 43.6532, lon: -79.3832 },
+    { name: 'Vancouver', country: 'CA', state: 'British Columbia', lat: 49.2827, lon: -123.1207 },
+    { name: 'Montreal', country: 'CA', state: 'Quebec', lat: 45.5017, lon: -73.5673 },
+    
+    // South America
+    { name: 'São Paulo', country: 'BR', lat: -23.5558, lon: -46.6396 },
+    { name: 'Rio de Janeiro', country: 'BR', lat: -22.9068, lon: -43.1729 },
+    { name: 'Buenos Aires', country: 'AR', lat: -34.6118, lon: -58.3960 },
+    { name: 'Lima', country: 'PE', lat: -12.0464, lon: -77.0428 },
+    
+    // Pakistan duplicates for common searches
+    { name: 'Hyderabad', country: 'PK', state: 'Sindh', lat: 25.3960, lon: 68.3578 },
+    { name: 'London', country: 'CA', state: 'Ontario', lat: 42.9849, lon: -81.2453 },
+    { name: 'Paris', country: 'US', state: 'Texas', lat: 33.6617, lon: -95.5555 }
+  ];
 
   const getWeatherIcon = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
@@ -78,7 +151,10 @@ const WeatherDemo = () => {
     }
 
     setSuggestionsLoading(true);
+    console.log('Fetching suggestions for:', query);
+    
     try {
+      // First try the real API
       const response = await fetch(
         `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
       );
@@ -94,75 +170,107 @@ const WeatherDemo = () => {
         }));
         setSuggestions(formattedSuggestions);
         setShowSuggestions(formattedSuggestions.length > 0);
+        console.log('API suggestions loaded:', formattedSuggestions.length);
       } else {
-        // Fallback to demo suggestions
-        const demoSuggestions = getDemoSuggestions(query);
-        setSuggestions(demoSuggestions);
-        setShowSuggestions(demoSuggestions.length > 0);
+        throw new Error('API unavailable');
       }
     } catch (error) {
-      console.error('Error fetching city suggestions:', error);
-      const demoSuggestions = getDemoSuggestions(query);
-      setSuggestions(demoSuggestions);
-      setShowSuggestions(demoSuggestions.length > 0);
+      console.log('Using enhanced local database for suggestions');
+      // Use enhanced local database
+      const filteredSuggestions = globalCitiesDatabase.filter(city => 
+        city.name.toLowerCase().includes(query.toLowerCase()) ||
+        (city.state && city.state.toLowerCase().includes(query.toLowerCase())) ||
+        city.country.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8); // Show more suggestions
+      
+      setSuggestions(filteredSuggestions);
+      setShowSuggestions(filteredSuggestions.length > 0);
+      console.log('Local suggestions loaded:', filteredSuggestions.length);
     } finally {
       setSuggestionsLoading(false);
     }
   };
 
-  const getDemoSuggestions = (query: string): CityData[] => {
-    const demoData = [
-      { name: 'Hyderabad', country: 'IN', state: 'Telangana', lat: 17.3850, lon: 78.4867 },
-      { name: 'Hyderabad', country: 'PK', state: 'Sindh', lat: 25.3960, lon: 68.3578 },
-      { name: 'London', country: 'GB', state: 'England', lat: 51.5074, lon: -0.1278 },
-      { name: 'London', country: 'CA', state: 'Ontario', lat: 42.9849, lon: -81.2453 },
-      { name: 'Paris', country: 'FR', lat: 48.8566, lon: 2.3522 },
-      { name: 'Paris', country: 'US', state: 'Texas', lat: 33.6617, lon: -95.5555 },
-      { name: 'Delhi', country: 'IN', lat: 28.7041, lon: 77.1025 },
-      { name: 'Mumbai', country: 'IN', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 },
-      { name: 'Bangalore', country: 'IN', state: 'Karnataka', lat: 12.9716, lon: 77.5946 },
-      { name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
-      { name: 'New York', country: 'US', state: 'New York', lat: 40.7128, lon: -74.0060 },
-      { name: 'Sydney', country: 'AU', state: 'New South Wales', lat: -33.8688, lon: 151.2093 }
-    ];
-
-    return demoData.filter(city => 
-      city.name.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5);
-  };
-
   const getCurrentLocation = () => {
+    console.log('GPS location requested');
     setGpsLoading(true);
     setError('');
 
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by this browser.');
+      const errorMsg = 'Geolocation is not supported by this browser.';
+      setError(errorMsg);
       setGpsLoading(false);
+      toast({
+        title: "GPS Error",
+        description: errorMsg,
+        variant: "destructive",
+      });
       return;
     }
 
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 300000 // 5 minutes cache
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        console.log('GPS position obtained:', position.coords);
         try {
           const { latitude, longitude } = position.coords;
           await fetchWeatherByCoordinates(latitude, longitude);
+          toast({
+            title: "Location Found",
+            description: "Weather data loaded for your current location",
+          });
         } catch (error) {
+          console.error('Error fetching weather for GPS location:', error);
           setError('Failed to get weather data for your location.');
+          toast({
+            title: "Weather Error", 
+            description: "Could not fetch weather for your location",
+            variant: "destructive",
+          });
         } finally {
           setGpsLoading(false);
         }
       },
       (error) => {
-        setError('Unable to retrieve your location. Please try searching manually.');
+        console.error('GPS error:', error);
+        let errorMessage = 'Unable to retrieve your location. ';
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Location access was denied. Please enable location permissions.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage += 'Location request timed out.';
+            break;
+          default:
+            errorMessage += 'An unknown error occurred.';
+            break;
+        }
+        
+        setError(errorMessage);
         setGpsLoading(false);
+        toast({
+          title: "GPS Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      options
     );
   };
 
   const fetchWeatherByCoordinates = async (lat: number, lon: number) => {
     setLoading(true);
     setError('');
+    console.log('Fetching weather for coordinates:', lat, lon);
     
     try {
       // Get current weather
@@ -171,7 +279,7 @@ const WeatherDemo = () => {
       );
       
       if (!currentWeatherResponse.ok) {
-        throw new Error('Failed to fetch weather data');
+        throw new Error('Weather API unavailable');
       }
 
       const currentWeather = await currentWeatherResponse.json();
@@ -202,17 +310,45 @@ const WeatherDemo = () => {
 
       setWeatherData(processedData);
       setCity(`${currentWeather.name}, ${currentWeather.sys.country}`);
+      console.log('Weather data loaded successfully');
     } catch (err) {
       console.error('Weather API error:', err);
-      setError('Failed to fetch weather data. Please try again.');
+      // Generate realistic demo data based on coordinates
+      const demoData = getLocationBasedDemoData(lat, lon);
+      setWeatherData(demoData);
+      setCity(`${demoData.cityName}, ${demoData.country}`);
+      setError('Using demo data. For live data, a valid API key is required.');
+      toast({
+        title: "Demo Mode",
+        description: "Showing demo weather data",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const getLocationBasedDemoData = (lat: number, lon: number): WeatherData => {
+    // Find nearest city in database
+    let nearestCity = globalCitiesDatabase[0];
+    let minDistance = Infinity;
+    
+    globalCitiesDatabase.forEach(city => {
+      const distance = Math.sqrt(
+        Math.pow(city.lat - lat, 2) + Math.pow(city.lon - lon, 2)
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCity = city;
+      }
+    });
+    
+    return getRealisticWeatherData(nearestCity.name, nearestCity.country);
+  };
+
   const fetchWeatherData = async (cityName: string, coordinates?: { lat: number; lon: number }) => {
     setLoading(true);
     setError('');
+    console.log('Fetching weather data for:', cityName, coordinates);
     
     try {
       let currentWeatherResponse;
@@ -241,6 +377,11 @@ const WeatherDemo = () => {
           console.log('Using demo data due to API limitations');
           const demoData = getRealisticWeatherData(cityName);
           setWeatherData(demoData);
+          setError('Using demo data. For live data, a valid API key is required.');
+          toast({
+            title: "Demo Mode",
+            description: "Showing demo weather data",
+          });
           return;
         } else {
           throw new Error('Failed to fetch weather data. Please try again.');
@@ -269,11 +410,19 @@ const WeatherDemo = () => {
       };
 
       setWeatherData(processedData);
+      toast({
+        title: "Weather Updated",
+        description: `Weather data loaded for ${processedData.cityName}`,
+      });
     } catch (err) {
       console.error('Weather API error:', err);
       const demoData = getRealisticWeatherData(cityName);
       setWeatherData(demoData);
       setError('Using demo data. For live data, a valid API key is required.');
+      toast({
+        title: "Demo Mode",
+        description: "Showing demo weather data",
+      });
     } finally {
       setLoading(false);
     }
@@ -323,7 +472,7 @@ const WeatherDemo = () => {
     }));
   };
 
-  const getRealisticWeatherData = (cityName: string): WeatherData => {
+  const getRealisticWeatherData = (cityName: string, countryCode?: string): WeatherData => {
     const city = cityName.toLowerCase();
     
     const weatherPatterns: { [key: string]: Partial<WeatherData> } = {
@@ -336,7 +485,10 @@ const WeatherDemo = () => {
       mumbai: { temperature: 32, condition: 'clouds', humidity: 75, windSpeed: 14, visibility: 8, description: 'humid and partly cloudy', feels_like: 38, pressure: 1010, country: 'IN' },
       hyderabad: { temperature: 29, condition: 'clear', humidity: 65, windSpeed: 12, visibility: 12, description: 'clear sky', feels_like: 33, pressure: 1012, country: 'IN' },
       bangalore: { temperature: 24, condition: 'clouds', humidity: 70, windSpeed: 8, visibility: 10, description: 'partly cloudy', feels_like: 26, pressure: 1014, country: 'IN' },
-      delhi: { temperature: 27, condition: 'clear', humidity: 55, windSpeed: 15, visibility: 8, description: 'clear sky', feels_like: 31, pressure: 1011, country: 'IN' }
+      delhi: { temperature: 27, condition: 'clear', humidity: 55, windSpeed: 15, visibility: 8, description: 'clear sky', feels_like: 31, pressure: 1011, country: 'IN' },
+      jaipur: { temperature: 25, condition: 'clear', humidity: 40, windSpeed: 12, visibility: 15, description: 'clear sky', feels_like: 28, pressure: 1013, country: 'IN' },
+      dubai: { temperature: 35, condition: 'clear', humidity: 45, windSpeed: 18, visibility: 20, description: 'hot and sunny', feels_like: 42, pressure: 1015, country: 'AE' },
+      singapore: { temperature: 30, condition: 'clouds', humidity: 80, windSpeed: 10, visibility: 12, description: 'tropical humidity', feels_like: 37, pressure: 1012, country: 'SG' }
     };
 
     const baseData = weatherPatterns[city] || {
@@ -348,7 +500,7 @@ const WeatherDemo = () => {
       description: 'partly cloudy',
       feels_like: Math.floor(Math.random() * 25) + 8,
       pressure: Math.floor(Math.random() * 30) + 1000,
-      country: 'Unknown'
+      country: countryCode || 'Unknown'
     };
 
     return {
@@ -380,6 +532,7 @@ const WeatherDemo = () => {
     setShowSuggestions(false);
     setSuggestions([]);
     fetchWeatherData(selectedCity.name, { lat: selectedCity.lat, lon: selectedCity.lon });
+    console.log('City selected:', selectedCity);
   };
 
   const handleSearch = () => {
@@ -390,6 +543,7 @@ const WeatherDemo = () => {
   };
 
   useEffect(() => {
+    console.log('WeatherDemo component mounted');
     fetchWeatherData('London');
   }, []);
 
@@ -415,13 +569,13 @@ const WeatherDemo = () => {
           <Card className="mb-8 glass-effect border-purple-200 transform hover:scale-105 transition-all duration-300 purple-glow">
             <CardHeader>
               <CardTitle className="text-purple-800">Search Location</CardTitle>
-              <CardDescription>Get real-time weather data for any city worldwide</CardDescription>
+              <CardDescription>Get real-time weather data for any city worldwide (Global coverage with smart suggestions)</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex gap-4 mb-4">
                 <div className="flex-1 relative" ref={inputRef}>
                   <Input
-                    placeholder="Enter city name (e.g., London, Paris, Tokyo, Hyderabad)..."
+                    placeholder="Search any city globally (e.g., London, Paris, Tokyo, Hyderabad, Jaipur, Dubai)..."
                     value={city}
                     onChange={handleCityInputChange}
                     className="border-purple-200 focus:border-purple-400"
