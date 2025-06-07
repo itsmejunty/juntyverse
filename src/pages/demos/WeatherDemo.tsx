@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,9 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Cloud, CloudRain, Sun, CloudSnow, Wind, Eye, Droplets, Thermometer, Gauge, MapPin, Clock, Search, AlertCircle, Loader2 } from 'lucide-react';
+import { Cloud, CloudRain, Sun, CloudSnow, Wind, Eye, Droplets, Thermometer, Gauge, MapPin, Clock, Search, AlertCircle, Loader2, Navigation } from 'lucide-react';
 
-// Define interfaces for weather data
 interface WeatherData {
   name: string;
   main: {
@@ -60,46 +60,11 @@ const WeatherDemo = () => {
   const [searchCity, setSearchCity] = useState('');
   const [suggestions, setSuggestions] = useState<CityData[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [showApiConfig, setShowApiConfig] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [gpsLoading, setGpsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Demo data for showcase
-  const demoWeatherData: WeatherData = {
-    name: 'Mumbai',
-    main: {
-      temp: 28,
-      feels_like: 32,
-      humidity: 78,
-      pressure: 1013
-    },
-    weather: [{
-      main: 'Clouds',
-      description: 'scattered clouds',
-      icon: '03d'
-    }],
-    wind: {
-      speed: 3.5
-    },
-    visibility: 10000,
-    sys: {
-      country: 'IN'
-    }
-  };
-
-  const demoForecastData: ForecastData = {
-    list: [
-      { dt: Date.now() / 1000, main: { temp: 28 }, weather: [{ main: 'Clouds', description: 'cloudy', icon: '03d' }] },
-      { dt: Date.now() / 1000 + 86400, main: { temp: 30 }, weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }] },
-      { dt: Date.now() / 1000 + 172800, main: { temp: 26 }, weather: [{ main: 'Rain', description: 'light rain', icon: '10d' }] },
-      { dt: Date.now() / 1000 + 259200, main: { temp: 29 }, weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }] },
-      { dt: Date.now() / 1000 + 345600, main: { temp: 27 }, weather: [{ main: 'Clouds', description: 'few clouds', icon: '02d' }] }
-    ]
-  };
-
-  // Comprehensive global cities database
   const globalCitiesDatabase: CityData[] = [
-    // India - Major cities
     { name: 'Mumbai', country: 'IN', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 },
     { name: 'Delhi', country: 'IN', state: 'Delhi', lat: 28.7041, lon: 77.1025 },
     { name: 'Bangalore', country: 'IN', state: 'Karnataka', lat: 12.9716, lon: 77.5946 },
@@ -108,7 +73,6 @@ const WeatherDemo = () => {
     { name: 'Kolkata', country: 'IN', state: 'West Bengal', lat: 22.5726, lon: 88.3639 },
     { name: 'Pune', country: 'IN', state: 'Maharashtra', lat: 18.5204, lon: 73.8567 },
     { name: 'Ahmedabad', country: 'IN', state: 'Gujarat', lat: 23.0225, lon: 72.5714 },
-    // International cities
     { name: 'New York', country: 'US', state: 'New York', lat: 40.7128, lon: -74.0060 },
     { name: 'London', country: 'GB', lat: 51.5074, lon: -0.1278 },
     { name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
@@ -122,8 +86,8 @@ const WeatherDemo = () => {
   ];
 
   useEffect(() => {
-    setWeatherData(demoWeatherData);
-    setForecastData(demoForecastData);
+    // Load default weather for Mumbai on component mount
+    loadWeatherForCity('Mumbai');
   }, []);
 
   useEffect(() => {
@@ -136,6 +100,132 @@ const WeatherDemo = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const getCurrentLocation = () => {
+    setGpsLoading(true);
+    setError(null);
+
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by this browser.');
+      setGpsLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrentLocation({ lat: latitude, lon: longitude });
+        loadWeatherForLocation(latitude, longitude);
+        setGpsLoading(false);
+      },
+      (error) => {
+        setError('Unable to retrieve your location. Please try searching for a city.');
+        setGpsLoading(false);
+      }
+    );
+  };
+
+  const loadWeatherForLocation = (lat: number, lon: number) => {
+    setLoading(true);
+    setError(null);
+
+    // Simulate API call with enhanced demo data based on location
+    setTimeout(() => {
+      const demoWeatherData: WeatherData = {
+        name: lat > 0 ? (lat > 50 ? 'London' : 'New York') : 'Sydney',
+        main: {
+          temp: Math.round(15 + Math.random() * 20),
+          feels_like: Math.round(18 + Math.random() * 20),
+          humidity: Math.round(40 + Math.random() * 40),
+          pressure: Math.round(1000 + Math.random() * 50)
+        },
+        weather: [{
+          main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)],
+          description: 'partly cloudy',
+          icon: '03d'
+        }],
+        wind: {
+          speed: Math.round(Math.random() * 10 * 10) / 10
+        },
+        visibility: 10000,
+        sys: {
+          country: lat > 50 ? 'GB' : (lat > 0 ? 'US' : 'AU')
+        }
+      };
+
+      const demoForecastData: ForecastData = {
+        list: Array.from({ length: 5 }, (_, i) => ({
+          dt: Date.now() / 1000 + (i * 86400),
+          main: { temp: Math.round(15 + Math.random() * 20) },
+          weather: [{ 
+            main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)], 
+            description: 'weather', 
+            icon: '03d' 
+          }]
+        }))
+      };
+
+      setWeatherData(demoWeatherData);
+      setForecastData(demoForecastData);
+      setLoading(false);
+    }, 1500);
+  };
+
+  const loadWeatherForCity = (cityName: string) => {
+    const city = globalCitiesDatabase.find(c => 
+      c.name.toLowerCase() === cityName.toLowerCase()
+    );
+    
+    if (!city) {
+      setError('City not found. Try searching for a major city.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    // Generate realistic demo data based on the selected city
+    setTimeout(() => {
+      const tempBase = city.lat > 30 ? 25 : (city.lat > 0 ? 15 : 20);
+      const demoWeatherData: WeatherData = {
+        name: city.name,
+        main: {
+          temp: Math.round(tempBase + Math.random() * 15),
+          feels_like: Math.round(tempBase + 3 + Math.random() * 15),
+          humidity: Math.round(50 + Math.random() * 40),
+          pressure: Math.round(1005 + Math.random() * 30)
+        },
+        weather: [{
+          main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)],
+          description: `Weather in ${city.name}`,
+          icon: '03d'
+        }],
+        wind: {
+          speed: Math.round(Math.random() * 8 * 10) / 10
+        },
+        visibility: 10000,
+        sys: {
+          country: city.country
+        }
+      };
+
+      const demoForecastData: ForecastData = {
+        list: Array.from({ length: 5 }, (_, i) => ({
+          dt: Date.now() / 1000 + (i * 86400),
+          main: { temp: Math.round(tempBase + Math.random() * 10) },
+          weather: [{ 
+            main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)], 
+            description: 'forecast', 
+            icon: '03d' 
+          }]
+        }))
+      };
+
+      setWeatherData(demoWeatherData);
+      setForecastData(demoForecastData);
+      setLoading(false);
+    }, 1000);
+  };
 
   const getWeatherIcon = (condition: string) => {
     switch (condition.toLowerCase()) {
@@ -152,21 +242,12 @@ const WeatherDemo = () => {
       c.name.toLowerCase() === searchCity.toLowerCase()
     );
     
-    if (!city) {
+    if (city) {
+      loadWeatherForCity(city.name);
+      setShowSuggestions(false);
+    } else {
       setError('City not found. Try searching for a major city.');
-      return;
     }
-
-    setLoading(true);
-    setError(null);
-    setShowSuggestions(false);
-
-    // Simulate API call with demo data
-    setTimeout(() => {
-      setWeatherData(demoWeatherData);
-      setForecastData(demoForecastData);
-      setLoading(false);
-    }, 1000);
   };
 
   const handleInputChange = (value: string) => {
@@ -202,7 +283,7 @@ const WeatherDemo = () => {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Get real-time weather information and 5-day forecasts for cities worldwide. 
-            This demo shows sample data - connect your OpenWeatherMap API key for live data.
+            Use GPS for your current location or search for any city.
           </p>
         </div>
 
@@ -216,7 +297,7 @@ const WeatherDemo = () => {
           </CardHeader>
           <CardContent>
             <div ref={searchRef} className="relative">
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-4">
                 <div className="relative flex-1">
                   <Input
                     type="text"
@@ -233,9 +314,23 @@ const WeatherDemo = () => {
                 </Button>
               </div>
 
+              <Button 
+                onClick={getCurrentLocation} 
+                disabled={gpsLoading}
+                variant="outline"
+                className="w-full"
+              >
+                {gpsLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Navigation className="h-4 w-4 mr-2" />
+                )}
+                Use Current Location
+              </Button>
+
               {/* City Suggestions */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-20 left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
                   {suggestions.map((city, index) => (
                     <div
                       key={index}
@@ -375,9 +470,9 @@ const WeatherDemo = () => {
         <Alert className="mt-8 border-blue-200 bg-blue-50">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Demo Mode:</strong> This is a demonstration showing sample weather data. 
-            To get real-time weather information, you would need to integrate with the OpenWeatherMap API 
-            and provide your own API key.
+            <strong>Enhanced Demo:</strong> This weather app now includes GPS functionality and proper city search. 
+            The weather data is simulated but changes based on your location and searched cities. 
+            For production use, integrate with a real weather API service.
           </AlertDescription>
         </Alert>
       </div>
