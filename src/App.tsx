@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import WeatherDemo from "./pages/demos/WeatherDemo";
 import TaskDemo from "./pages/demos/TaskDemo";
 import EcommerceDemo from "./pages/demos/EcommerceDemo";
+import PortfolioDemo from "./pages/demos/PortfolioDemo";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/demo/weather" element={<WeatherDemo />} />
           <Route path="/demo/tasks" element={<TaskDemo />} />
           <Route path="/demo/ecommerce" element={<EcommerceDemo />} />
+          <Route path="/demo/portfolio" element={<PortfolioDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

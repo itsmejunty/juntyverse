@@ -9,20 +9,20 @@ import { Link } from 'react-router-dom';
 
 const projects: ProjectCardProps[] = [
   {
+    title: "Portfolio Builder",
+    description: "An interactive portfolio website builder that helps users create professional portfolio websites with real-time preview and code export.",
+    image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=2036",
+    technologies: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
+    githubUrl: "https://github.com/",
+    liveUrl: "/demo/portfolio"
+  },
+  {
     title: "Weather Dashboard",
     description: "A React-based web app fetching weather data via OpenWeatherMap API to display current conditions and forecasts.",
     image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?auto=format&fit=crop&q=80&w=1974",
     technologies: ["React", "JavaScript", "CSS", "APIs"],
     githubUrl: "https://github.com/",
     liveUrl: "/demo/weather"
-  },
-  {
-    title: "Personal Portfolio Website",
-    description: "A showcase of my skills, projects, and achievements, featuring a contact form and social media integration.",
-    image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=2036",
-    technologies: ["HTML", "CSS", "JavaScript", "React"],
-    githubUrl: "https://github.com/",
-    liveUrl: "/"
   }
 ];
 

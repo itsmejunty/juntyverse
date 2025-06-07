@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
 
@@ -12,12 +13,12 @@ const Projects = () => {
       liveUrl: "/demo/weather"
     },
     {
-      title: "Personal Portfolio Website",
-      description: "A showcase of my skills, projects, and achievements, featuring a contact form and social media integration. Built with modern web technologies and focusing on accessibility and performance.",
+      title: "Portfolio Builder",
+      description: "An interactive portfolio website builder that helps users create professional portfolio websites. Features real-time preview, theme selection, content management, and code export functionality.",
       image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=2036",
-      technologies: ["HTML", "CSS", "JavaScript", "React"],
+      technologies: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
       githubUrl: "https://github.com/",
-      liveUrl: "/"
+      liveUrl: "/demo/portfolio"
     },
     {
       title: "Task Management App",
