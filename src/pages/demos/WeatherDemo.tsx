@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Cloud, CloudRain, Sun, CloudSnow, Wind, Eye, Droplets, Thermometer, Gauge, MapPin, Clock, Search, AlertCircle, Loader2, Navigation } from 'lucide-react';
+import { indianCitiesDatabase, getIndianCitySuggestions } from '@/data/indianCities';
 
 interface WeatherData {
   name: string;
@@ -64,15 +64,16 @@ const WeatherDemo = () => {
   const [gpsLoading, setGpsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
+  // Enhanced global cities database with more Indian cities
   const globalCitiesDatabase: CityData[] = [
-    { name: 'Mumbai', country: 'IN', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 },
-    { name: 'Delhi', country: 'IN', state: 'Delhi', lat: 28.7041, lon: 77.1025 },
-    { name: 'Bangalore', country: 'IN', state: 'Karnataka', lat: 12.9716, lon: 77.5946 },
-    { name: 'Hyderabad', country: 'IN', state: 'Telangana', lat: 17.3850, lon: 78.4867 },
-    { name: 'Chennai', country: 'IN', state: 'Tamil Nadu', lat: 13.0827, lon: 80.2707 },
-    { name: 'Kolkata', country: 'IN', state: 'West Bengal', lat: 22.5726, lon: 88.3639 },
-    { name: 'Pune', country: 'IN', state: 'Maharashtra', lat: 18.5204, lon: 73.8567 },
-    { name: 'Ahmedabad', country: 'IN', state: 'Gujarat', lat: 23.0225, lon: 72.5714 },
+    ...indianCitiesDatabase.map(city => ({
+      name: city.name,
+      country: city.country,
+      state: city.state,
+      lat: city.lat,
+      lon: city.lon
+    })),
+    // International cities
     { name: 'New York', country: 'US', state: 'New York', lat: 40.7128, lon: -74.0060 },
     { name: 'London', country: 'GB', lat: 51.5074, lon: -0.1278 },
     { name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
@@ -114,52 +115,93 @@ const WeatherDemo = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        console.log('GPS Location detected:', { latitude, longitude });
         setCurrentLocation({ lat: latitude, lon: longitude });
         loadWeatherForLocation(latitude, longitude);
         setGpsLoading(false);
       },
       (error) => {
-        setError('Unable to retrieve your location. Please try searching for a city.');
+        console.error('GPS Error:', error);
+        setError('Unable to retrieve your location. Please enable location access and try again.');
         setGpsLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
       }
     );
+  };
+
+  const findNearestCity = (lat: number, lon: number): CityData => {
+    console.log('Finding nearest city for coordinates:', { lat, lon });
+    
+    let nearestCity = globalCitiesDatabase[0];
+    let minDistance = calculateDistance(lat, lon, nearestCity.lat, nearestCity.lon);
+
+    globalCitiesDatabase.forEach(city => {
+      const distance = calculateDistance(lat, lon, city.lat, city.lon);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCity = city;
+      }
+    });
+
+    console.log('Nearest city found:', nearestCity, 'Distance:', minDistance.toFixed(2), 'km');
+    return nearestCity;
+  };
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   };
 
   const loadWeatherForLocation = (lat: number, lon: number) => {
     setLoading(true);
     setError(null);
 
-    // Simulate API call with enhanced demo data based on location
+    // Find the nearest city based on GPS coordinates
+    const nearestCity = findNearestCity(lat, lon);
+    
+    // Generate realistic demo data based on the actual GPS location
     setTimeout(() => {
+      const tempBase = lat > 30 ? 30 : (lat > 20 ? 28 : (lat > 10 ? 25 : 22));
       const demoWeatherData: WeatherData = {
-        name: lat > 0 ? (lat > 50 ? 'London' : 'New York') : 'Sydney',
+        name: nearestCity.name,
         main: {
-          temp: Math.round(15 + Math.random() * 20),
-          feels_like: Math.round(18 + Math.random() * 20),
-          humidity: Math.round(40 + Math.random() * 40),
-          pressure: Math.round(1000 + Math.random() * 50)
+          temp: Math.round(tempBase + Math.random() * 10),
+          feels_like: Math.round(tempBase + 3 + Math.random() * 10),
+          humidity: Math.round(50 + Math.random() * 40),
+          pressure: Math.round(1005 + Math.random() * 30)
         },
         weather: [{
           main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)],
-          description: 'partly cloudy',
+          description: `Current weather near ${nearestCity.name}`,
           icon: '03d'
         }],
         wind: {
-          speed: Math.round(Math.random() * 10 * 10) / 10
+          speed: Math.round(Math.random() * 8 * 10) / 10
         },
         visibility: 10000,
         sys: {
-          country: lat > 50 ? 'GB' : (lat > 0 ? 'US' : 'AU')
+          country: nearestCity.country
         }
       };
 
       const demoForecastData: ForecastData = {
         list: Array.from({ length: 5 }, (_, i) => ({
           dt: Date.now() / 1000 + (i * 86400),
-          main: { temp: Math.round(15 + Math.random() * 20) },
+          main: { temp: Math.round(tempBase + Math.random() * 8) },
           weather: [{ 
             main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)], 
-            description: 'weather', 
+            description: 'forecast', 
             icon: '03d' 
           }]
         }))
@@ -177,7 +219,7 @@ const WeatherDemo = () => {
     );
     
     if (!city) {
-      setError('City not found. Try searching for a major city.');
+      setError('City not found. Try searching from the available cities.');
       return;
     }
 
@@ -246,7 +288,7 @@ const WeatherDemo = () => {
       loadWeatherForCity(city.name);
       setShowSuggestions(false);
     } else {
-      setError('City not found. Try searching for a major city.');
+      setError('City not found. Try searching from the available cities.');
     }
   };
 
@@ -256,9 +298,10 @@ const WeatherDemo = () => {
     if (value.length > 0) {
       const filtered = globalCitiesDatabase
         .filter(city => 
-          city.name.toLowerCase().includes(value.toLowerCase())
+          city.name.toLowerCase().includes(value.toLowerCase()) ||
+          (city.state && city.state.toLowerCase().includes(value.toLowerCase()))
         )
-        .slice(0, 5);
+        .slice(0, 8);
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {
@@ -470,9 +513,9 @@ const WeatherDemo = () => {
         <Alert className="mt-8 border-blue-200 bg-blue-50">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Enhanced Demo:</strong> This weather app now includes GPS functionality and proper city search. 
-            The weather data is simulated but changes based on your location and searched cities. 
-            For production use, integrate with a real weather API service.
+            <strong>Enhanced Demo:</strong> This weather app now includes improved GPS functionality that finds your nearest city based on actual coordinates. 
+            The database includes {globalCitiesDatabase.length}+ cities including comprehensive Indian cities. 
+            The weather data is simulated but changes based on your actual location and searched cities.
           </AlertDescription>
         </Alert>
       </div>
