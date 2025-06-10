@@ -7,7 +7,7 @@ const Projects = () => {
     {
       title: "Weather Dashboard",
       description: "A React-based web app fetching weather data via OpenWeatherMap API to display current conditions and forecasts. Features include location search, 5-day forecast, and responsive design for all device sizes.",
-      image: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?auto=format&fit=crop&q=80&w=1974",
+      image: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&q=80&w=1974",
       technologies: ["React", "JavaScript", "CSS", "OpenWeatherMap API"],
       githubUrl: "https://github.com/",
       liveUrl: "/demo/weather"
@@ -15,7 +15,7 @@ const Projects = () => {
     {
       title: "Portfolio Builder",
       description: "An interactive portfolio website builder that helps users create professional portfolio websites. Features real-time preview, theme selection, content management, and code export functionality.",
-      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=2036",
+      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&q=80&w=2069",
       technologies: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
       githubUrl: "https://github.com/",
       liveUrl: "/demo/portfolio"
@@ -23,7 +23,7 @@ const Projects = () => {
     {
       title: "Task Management App",
       description: "A full-stack application for managing tasks and projects. Features include task creation, assignment, status tracking, and team collaboration tools.",
-      image: "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?auto=format&fit=crop&q=80&w=2070",
+      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&q=80&w=2070",
       technologies: ["React", "Node.js", "Express", "MongoDB"],
       githubUrl: "https://github.com/",
       liveUrl: "/demo/tasks"
@@ -31,7 +31,7 @@ const Projects = () => {
     {
       title: "E-commerce Store",
       description: "A fictional e-commerce platform with product listings, shopping cart, and checkout process. Integrated with mock payment processing and order management.",
-      image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=2070",
+      image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=2070",
       technologies: ["React", "Redux", "CSS", "Firebase"],
       githubUrl: "https://github.com/",
       liveUrl: "/demo/ecommerce"
