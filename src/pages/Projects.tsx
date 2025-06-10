@@ -1,6 +1,6 @@
-
 import React from 'react';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
+import ScrollAnimation from '@/components/ScrollAnimation';
 
 const Projects = () => {
   const projects: ProjectCardProps[] = [
@@ -42,14 +42,28 @@ const Projects = () => {
     <main className="min-h-screen pt-32 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
-          <p className="text-lg text-muted-foreground mb-12 max-w-3xl">
-            A collection of my recent work. Each project represents different challenges and learning experiences.
-          </p>
+          <ScrollAnimation animation="fade-up" delay={100}>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
+          </ScrollAnimation>
+          
+          <ScrollAnimation animation="fade-up" delay={300}>
+            <p className="text-lg text-muted-foreground mb-12 max-w-3xl">
+              A collection of my recent work. Each project represents different challenges and learning experiences.
+            </p>
+          </ScrollAnimation>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.map((project) => (
-              <ProjectCard key={project.title} {...project} />
+            {projects.map((project, index) => (
+              <ScrollAnimation 
+                key={project.title} 
+                animation="fade-up" 
+                delay={100 + index * 150}
+                className="hover-lift transition-all duration-500"
+              >
+                <div className="glass-effect rounded-2xl p-1 hover:purple-glow transition-all duration-300 hover:shadow-2xl hover:shadow-purple-300/50">
+                  <ProjectCard {...project} />
+                </div>
+              </ScrollAnimation>
             ))}
           </div>
         </div>

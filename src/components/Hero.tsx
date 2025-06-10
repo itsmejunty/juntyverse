@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Star, Code, Palette, Zap, Rocket, Globe, Database, Cpu, Smartphone, Monitor, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import EnhancedButton from './EnhancedButton';
+import ScrollAnimation from './ScrollAnimation';
 
 const Hero = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -109,7 +109,7 @@ const Hero = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-12 max-w-6xl mx-auto">
           {/* Enhanced Interactive Avatar with more effects */}
-          <div className="relative mb-8 md:mb-0 order-1 md:order-2 animate-fade-in group">
+          <ScrollAnimation animation="scale-up" delay={200} className="mb-8 md:mb-0 order-1 md:order-2 group">
             {/* Multiple animated rings with different effects */}
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/60 to-violet-600/60 rounded-full blur-xl opacity-80 animate-pulse group-hover:blur-2xl transition-all duration-500"></div>
             <div className="absolute inset-0 bg-gradient-to-r from-violet-400/40 to-purple-500/40 rounded-full blur-2xl opacity-60 animate-ping animation-duration-3000"></div>
@@ -146,114 +146,137 @@ const Hero = () => {
             <span className="absolute top-24 right-8 text-violet-400 animate-pulse hover:scale-125 transition-all duration-300 cursor-pointer hover:text-violet-600" style={{ animationDelay: '1.5s' }}>
               <Star className="h-4 w-4 fill-violet-200 hover:fill-violet-400" />
             </span>
-          </div>
+          </ScrollAnimation>
 
           <div className="flex flex-col items-start space-y-8 max-w-3xl order-2 md:order-1">
             {/* Enhanced Status Badge with more animations */}
-            <Badge 
-              variant="outline" 
-              className={`py-3 px-6 gap-3 text-sm glass-effect border-purple-200 hover:shadow-lg hover:shadow-purple-200/50 transition-all duration-300 hover:scale-105 cursor-pointer hover:border-purple-300 ${
-                isVisible ? 'animate-slide-up' : 'opacity-0'
-              }`}
-            >
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-600"></span>
-              </span>
-              Available for new opportunities
-            </Badge>
+            <ScrollAnimation animation="slide-right" delay={100}>
+              <Badge 
+                variant="outline" 
+                className={`py-3 px-6 gap-3 text-sm glass-effect border-purple-200 hover:shadow-lg hover:shadow-purple-200/50 transition-all duration-300 hover:scale-105 cursor-pointer hover:border-purple-300 ${
+                  isVisible ? 'animate-slide-up' : 'opacity-0'
+                }`}
+              >
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-600"></span>
+                </span>
+                Available for new opportunities
+              </Badge>
+            </ScrollAnimation>
             
             {/* Enhanced Typography with more effects */}
             <div className="space-y-6">
-              <h1 className={`font-bold text-5xl md:text-7xl leading-tight tracking-tight ${
-                isVisible ? 'animate-fade-in' : 'opacity-0'
-              }`}>
-                Hey, I'm <span className="text-gradient-purple inline-block relative hover:scale-105 transition-transform duration-300 cursor-pointer group">
-                  Jadidya
-                  <span className="absolute -bottom-2 left-0 w-full h-2 bg-gradient-to-r from-purple-500 via-violet-500 to-fuchsia-500 rounded-full animate-pulse opacity-70 group-hover:opacity-100 group-hover:h-3 transition-all duration-300"></span>
-                  <span className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-fuchsia-400 via-purple-400 to-violet-400 rounded-full animate-pulse opacity-40 group-hover:opacity-70 transition-all duration-300" style={{ animationDelay: '0.5s' }}></span>
-                </span>
-              </h1>
+              <ScrollAnimation animation="fade-up" delay={200}>
+                <h1 className={`font-bold text-5xl md:text-7xl leading-tight tracking-tight ${
+                  isVisible ? 'animate-fade-in' : 'opacity-0'
+                }`}>
+                  Hey, I'm <span className="text-gradient-purple inline-block relative hover:scale-105 transition-transform duration-300 cursor-pointer group">
+                    Jadidya
+                    <span className="absolute -bottom-2 left-0 w-full h-2 bg-gradient-to-r from-purple-500 via-violet-500 to-fuchsia-500 rounded-full animate-pulse opacity-70 group-hover:opacity-100 group-hover:h-3 transition-all duration-300"></span>
+                    <span className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-fuchsia-400 via-purple-400 to-violet-400 rounded-full animate-pulse opacity-40 group-hover:opacity-70 transition-all duration-300" style={{ animationDelay: '0.5s' }}></span>
+                  </span>
+                </h1>
+              </ScrollAnimation>
               
-              <h2 className={`text-3xl md:text-5xl font-light text-foreground/90 tracking-tight ${
-                isVisible ? 'animate-fade-in' : 'opacity-0'
-              }`} style={{ animationDelay: '0.2s' }}>
-                Front-end & <span className="text-gradient-purple hover:bg-gradient-to-r hover:from-fuchsia-500 hover:to-purple-600 transition-all duration-500 cursor-pointer hover:scale-105 inline-block">Full-Stack</span> Developer
-              </h2>
+              <ScrollAnimation animation="fade-up" delay={400}>
+                <h2 className={`text-3xl md:text-5xl font-light text-foreground/90 tracking-tight ${
+                  isVisible ? 'animate-fade-in' : 'opacity-0'
+                }`} style={{ animationDelay: '0.2s' }}>
+                  Front-end & <span className="text-gradient-purple hover:bg-gradient-to-r hover:from-fuchsia-500 hover:to-purple-600 transition-all duration-500 cursor-pointer hover:scale-105 inline-block">Full-Stack</span> Developer
+                </h2>
+              </ScrollAnimation>
             </div>
             
             {/* Enhanced Description with more interactive elements */}
-            <p className={`text-lg md:text-xl text-muted-foreground/90 max-w-2xl leading-relaxed ${
-              isVisible ? 'animate-fade-in' : 'opacity-0'
-            }`} style={{ animationDelay: '0.4s' }}>
-              A recent B.Tech graduate in Computer Science specializing in crafting
-              <span className="text-gradient-purple font-medium hover:font-semibold transition-all duration-300 cursor-pointer hover:scale-105 inline-block"> exceptional web experiences </span> 
-              with React and Node.js. I build elegant, responsive solutions that combine 
-              <span className="text-gradient-purple font-medium hover:font-semibold transition-all duration-300 cursor-pointer hover:scale-105 inline-block"> aesthetics with performance</span>.
-            </p>
+            <ScrollAnimation animation="fade-up" delay={600}>
+              <p className={`text-lg md:text-xl text-muted-foreground/90 max-w-2xl leading-relaxed ${
+                isVisible ? 'animate-fade-in' : 'opacity-0'
+              }`} style={{ animationDelay: '0.4s' }}>
+                A recent B.Tech graduate in Computer Science specializing in crafting
+                <span className="text-gradient-purple font-medium hover:font-semibold transition-all duration-300 cursor-pointer hover:scale-105 inline-block"> exceptional web experiences </span> 
+                with React and Node.js. I build elegant, responsive solutions that combine 
+                <span className="text-gradient-purple font-medium hover:font-semibold transition-all duration-300 cursor-pointer hover:scale-105 inline-block"> aesthetics with performance</span>.
+              </p>
+            </ScrollAnimation>
             
             {/* Enhanced Interactive Buttons with more effects */}
-            <div className={`flex flex-col sm:flex-row gap-6 pt-8 ${
-              isVisible ? 'animate-fade-in' : 'opacity-0'
-            }`} style={{ animationDelay: '0.6s' }}>
-              <Link to="/projects">
-                <Button size="lg" className="group relative overflow-hidden transition-all duration-500 px-8 py-6 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-105 hover:-translate-y-1 purple-glow">
-                  <span className="absolute inset-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-                  <span className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-                  <span className="relative z-10 flex items-center gap-3 text-base font-medium">
-                    View my projects
-                    <ArrowRight className="transition-transform group-hover:translate-x-2 group-hover:scale-110" />
-                  </span>
-                </Button>
-              </Link>
-              <Link to="/contact">
-                <Button size="lg" variant="outline" className="group border-purple-300 hover:border-violet-400 px-8 py-6 hover:shadow-xl hover:shadow-purple-200/30 hover:scale-105 hover:-translate-y-1 transition-all duration-500 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 glass-effect relative overflow-hidden">
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-100/50 to-violet-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative z-10 flex items-center gap-3 text-base font-medium text-purple-700 group-hover:text-purple-800">
-                    Get in touch
-                    <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
-                  </span>
-                </Button>
-              </Link>
-            </div>
+            <ScrollAnimation animation="fade-up" delay={800}>
+              <div className={`flex flex-col sm:flex-row gap-6 pt-8 ${
+                isVisible ? 'animate-fade-in' : 'opacity-0'
+              }`} style={{ animationDelay: '0.6s' }}>
+                <Link to="/projects">
+                  <EnhancedButton
+                    size="lg"
+                    className="group relative overflow-hidden transition-all duration-500 px-8 py-6 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-105 hover:-translate-y-1 purple-glow"
+                    loadingDuration={800}
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+                    <span className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                    <span className="relative z-10 flex items-center gap-3 text-base font-medium">
+                      View my projects
+                      <ArrowRight className="transition-transform group-hover:translate-x-2 group-hover:scale-110" />
+                    </span>
+                  </EnhancedButton>
+                </Link>
+                <Link to="/contact">
+                  <EnhancedButton
+                    size="lg"
+                    variant="outline"
+                    className="group border-purple-300 hover:border-violet-400 px-8 py-6 hover:shadow-xl hover:shadow-purple-200/30 hover:scale-105 hover:-translate-y-1 transition-all duration-500 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 glass-effect relative overflow-hidden"
+                    loadingDuration={800}
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-purple-100/50 to-violet-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className="relative z-10 flex items-center gap-3 text-base font-medium text-purple-700 group-hover:text-purple-800">
+                      Get in touch
+                      <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
+                    </span>
+                  </EnhancedButton>
+                </Link>
+              </div>
+            </ScrollAnimation>
 
             {/* Enhanced Skills Preview with rotation animation */}
-            <div className={`flex flex-wrap gap-3 pt-4 ${
-              isVisible ? 'animate-fade-in' : 'opacity-0'
-            }`} style={{ animationDelay: '0.8s' }}>
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-muted-foreground">Currently working with:</span>
-                <Badge 
-                  className="px-4 py-2 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 hover:from-purple-200 hover:to-violet-200 hover:scale-110 transition-all duration-300 cursor-pointer glass-effect animate-pulse"
-                >
-                  {skills[currentSkill]}
-                </Badge>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['React', 'TypeScript', 'Node.js', 'Tailwind CSS', 'MongoDB'].map((skill, index) => (
+            <ScrollAnimation animation="fade-up" delay={1000}>
+              <div className={`flex flex-wrap gap-3 pt-4 ${
+                isVisible ? 'animate-fade-in' : 'opacity-0'
+              }`} style={{ animationDelay: '0.8s' }}>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-muted-foreground">Currently working with:</span>
                   <Badge 
-                    key={skill} 
-                    className="px-3 py-1 bg-white/80 text-purple-700 hover:bg-purple-100 hover:scale-110 transition-all duration-300 cursor-pointer glass-effect text-xs"
-                    style={{ animationDelay: `${0.8 + index * 0.1}s` }}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 hover:from-purple-200 hover:to-violet-200 hover:scale-110 transition-all duration-300 cursor-pointer glass-effect animate-pulse"
                   >
-                    {skill}
+                    {skills[currentSkill]}
                   </Badge>
-                ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {['React', 'TypeScript', 'Node.js', 'Tailwind CSS', 'MongoDB'].map((skill, index) => (
+                    <Badge 
+                      key={skill} 
+                      className="px-3 py-1 bg-white/80 text-purple-700 hover:bg-purple-100 hover:scale-110 transition-all duration-300 cursor-pointer glass-effect text-xs"
+                      style={{ animationDelay: `${0.8 + index * 0.1}s` }}
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
+            </ScrollAnimation>
           </div>
         </div>
           
         {/* Enhanced Interactive Scroll Indicator with more animations */}
-        <div className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center animate-bounce cursor-pointer group hover:scale-110 transition-all duration-300">
-          <span className="text-sm font-medium text-gradient-purple mb-2 group-hover:from-fuchsia-500 group-hover:to-purple-700 transition-all duration-300">
-            Scroll to explore
-          </span>
-          <div className="relative">
-            <ArrowRight className="rotate-90 w-4 h-4 text-purple-600 group-hover:text-violet-700 transition-colors duration-300" />
-            <div className="absolute inset-0 bg-purple-400/20 rounded-full blur-sm group-hover:bg-purple-400/40 transition-all duration-300 animate-ping"></div>
+        <ScrollAnimation animation="fade-up" delay={1200}>
+          <div className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center animate-bounce cursor-pointer group hover:scale-110 transition-all duration-300">
+            <span className="text-sm font-medium text-gradient-purple mb-2 group-hover:from-fuchsia-500 group-hover:to-purple-700 transition-all duration-300">
+              Scroll to explore
+            </span>
+            <div className="relative">
+              <ArrowRight className="rotate-90 w-4 h-4 text-purple-600 group-hover:text-violet-700 transition-colors duration-300" />
+              <div className="absolute inset-0 bg-purple-400/20 rounded-full blur-sm group-hover:bg-purple-400/40 transition-all duration-300 animate-ping"></div>
+            </div>
           </div>
-        </div>
+        </ScrollAnimation>
       </div>
     </section>
   );
