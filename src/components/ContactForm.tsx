@@ -1,11 +1,11 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
-import { Send, MessageCircle, User, Mail, FileText, Sparkles } from 'lucide-react';
+import { Send, MessageCircle, User, Mail, FileText, Sparkles, Trash2 } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
 // EmailJS configuration constants
@@ -16,12 +16,42 @@ const EMAILJS_PUBLIC_KEY = 'gIFZN3uJWbJjIIXwC';
 const ContactForm = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isChatMode, setIsChatMode] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'admin', content: string }[]>([
-    { sender: 'admin', content: "Hi there! 👋 I'm available to chat. Feel free to send me a message and I'll get back to you soon!" }
-  ]);
+  const [isChatMode, setIsChatMode] = useState(() => {
+    return localStorage.getItem('contactChatMode') === 'true';
+  });
+  
+  const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'admin', content: string, timestamp: number }[]>(() => {
+    const savedMessages = localStorage.getItem('contactChatMessages');
+    if (savedMessages) {
+      return JSON.parse(savedMessages);
+    }
+    return [
+      { 
+        sender: 'admin', 
+        content: "Hi there! 👋 I'm available to chat. Feel free to send me a message and I'll get back to you soon!",
+        timestamp: Date.now()
+      }
+    ];
+  });
+  
   const [messageInput, setMessageInput] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Save chat messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('contactChatMessages', JSON.stringify(chatMessages));
+  }, [chatMessages]);
+
+  // Save chat mode preference
+  useEffect(() => {
+    localStorage.setItem('contactChatMode', isChatMode.toString());
+  }, [isChatMode]);
+
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
   
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,8 +91,13 @@ const ContactForm = () => {
     
     if (!messageInput.trim()) return;
     
-    // Add user message with animation
-    setChatMessages(prev => [...prev, { sender: 'user', content: messageInput }]);
+    // Add user message with timestamp
+    const newUserMessage = { 
+      sender: 'user' as const, 
+      content: messageInput, 
+      timestamp: Date.now() 
+    };
+    setChatMessages(prev => [...prev, newUserMessage]);
     
     // Prepare email data for chat message
     const emailData = {
@@ -82,20 +117,41 @@ const ContactForm = () => {
       .then(() => {
         // Email sent successfully, add simulated response
         setTimeout(() => {
-          setChatMessages(prev => [...prev, { 
-            sender: 'admin', 
-            content: "Thanks for your message! I'll get back to you as soon as possible. 🚀" 
-          }]);
+          const adminResponse = { 
+            sender: 'admin' as const, 
+            content: "Thanks for your message! I'll get back to you as soon as possible. 🚀",
+            timestamp: Date.now()
+          };
+          setChatMessages(prev => [...prev, adminResponse]);
         }, 1000);
       })
       .catch((error) => {
         console.error('Chat message email failed:', error);
         // Still show the message in UI even if email fails
-        setChatMessages(prev => [...prev, { 
-          sender: 'admin', 
-          content: "Thanks for your message! I'll get back to you as soon as possible. 🚀" 
-        }]);
+        const adminResponse = { 
+          sender: 'admin' as const, 
+          content: "Thanks for your message! I'll get back to you as soon as possible. 🚀",
+          timestamp: Date.now()
+        };
+        setChatMessages(prev => [...prev, adminResponse]);
       });
+  };
+
+  const clearChatHistory = () => {
+    const initialMessage = { 
+      sender: 'admin' as const, 
+      content: "Hi there! 👋 I'm available to chat. Feel free to send me a message and I'll get back to you soon!",
+      timestamp: Date.now()
+    };
+    setChatMessages([initialMessage]);
+    toast({
+      title: "Chat cleared",
+      description: "Chat history has been cleared.",
+    });
+  };
+
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   if (isChatMode) {
@@ -117,24 +173,40 @@ const ContactForm = () => {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-background to-secondary/30 border rounded-2xl h-80 overflow-y-auto p-4 flex flex-col space-y-3 shadow-inner backdrop-blur-sm">
+        <div className="bg-gradient-to-br from-background to-secondary/30 border rounded-2xl h-80 overflow-y-auto p-4 flex flex-col space-y-3 shadow-inner backdrop-blur-sm relative">
           {chatMessages.map((message, index) => (
             <div 
-              key={index}
+              key={`${message.timestamp}-${index}`}
               className={`max-w-[80%] animate-slide-in-right ${message.sender === 'user' 
                 ? 'self-end bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-xl' 
                 : 'self-start bg-gradient-to-r from-muted to-muted/80 shadow-md hover:shadow-lg'} rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="flex items-center gap-2 mb-1">
-                {message.sender === 'admin' && <Sparkles className="w-3 h-3 text-accent animate-pulse" />}
-                <span className="text-xs opacity-70">
-                  {message.sender === 'user' ? 'You' : 'Jadidya'}
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-center gap-2">
+                  {message.sender === 'admin' && <Sparkles className="w-3 h-3 text-accent animate-pulse" />}
+                  <span className="text-xs opacity-70">
+                    {message.sender === 'user' ? 'You' : 'Jadidya'}
+                  </span>
+                </div>
+                <span className="text-xs opacity-50">
+                  {formatTimestamp(message.timestamp)}
                 </span>
               </div>
-              {message.content}
+              <div className="text-sm">{message.content}</div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
+          
+          {/* Clear chat button */}
+          <Button
+            onClick={clearChatHistory}
+            variant="ghost"
+            size="sm"
+            className="absolute top-2 right-2 opacity-60 hover:opacity-100 transition-opacity"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
         
         <form onSubmit={handleSendChatMessage} className="flex space-x-2 animate-fade-in">

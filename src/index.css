@@ -206,7 +206,7 @@
   }
 }
 
-/* Page transition animations */
+/* Smooth page transition animations */
 @keyframes page-enter {
   from {
     opacity: 0;
@@ -229,16 +229,51 @@
   }
 }
 
+/* Slide animations for chat messages */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Smooth hover transitions */
+@keyframes hover-lift {
+  from {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  to {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(168, 85, 247, 0.2);
+  }
+}
+
 .animate-fade-in {
-  animation: fade-in 0.8s ease-out forwards;
+  animation: fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-slide-up {
-  animation: slide-up 1s ease-out forwards;
+  animation: slide-up 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-bounce-in {
-  animation: bounce-in 1.2s ease-out forwards;
+  animation: bounce-in 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-float {
@@ -270,7 +305,7 @@
 }
 
 .animate-button-press {
-  animation: button-press 0.2s ease-out;
+  animation: button-press 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-ripple {
@@ -278,11 +313,19 @@
 }
 
 .animate-page-enter {
-  animation: page-enter 0.7s ease-out forwards;
+  animation: page-enter 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-page-exit {
-  animation: page-exit 0.3s ease-in forwards;
+  animation: page-exit 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .section-gradient {
@@ -339,7 +382,7 @@
 
 /* Enhanced interactive elements */
 .interactive-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
@@ -355,7 +398,7 @@
 
 /* Weather specific animations */
 .weather-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .weather-card:hover {
@@ -386,7 +429,7 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
+  transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-vibrant:hover::before {
@@ -408,15 +451,52 @@
 
 /* Micro-interaction feedback */
 .micro-bounce:active {
-  animation: button-press 0.1s ease-out;
+  animation: button-press 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Smooth transitions for all interactive elements */
 * {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Override for elements that shouldn't have transitions */
 .no-transition, .no-transition * {
   transition: none !important;
+}
+
+/* Enhanced scale effect for better smoothness */
+.scale-98 {
+  transform: scale(0.98);
+}
+
+.scale-102 {
+  transform: scale(1.02);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for chat messages */
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: rgba(168, 85, 247, 0.1);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.3);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.5);
 }
