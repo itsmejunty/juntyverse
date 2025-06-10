@@ -4,7 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Heart, Star, Plus, Minus, Filter, Search, Truck, Shield, RefreshCw, Award, Users, Clock } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Plus, Minus, Filter, Search, Truck, Shield, RefreshCw, Award, Users, Clock, IndianRupee, DollarSign, Euro, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
+import PaymentModal from '@/components/PaymentModal';
 
 interface Product {
   id: number;
@@ -26,18 +28,25 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+interface Currency {
+  code: string;
+  symbol: string;
+  rate: number;
+}
+
 const EcommerceDemo = () => {
   const [products] = useState<Product[]>([
+    // Electronics (30 products)
     {
       id: 1,
       name: 'Premium Wireless Headphones',
-      price: 299,
-      originalPrice: 399,
+      price: 24999,
+      originalPrice: 32999,
       image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
       rating: 4.8,
       reviews: 2847,
       category: 'Electronics',
-      description: 'Experience premium sound quality with our flagship wireless headphones featuring active noise cancellation.',
+      description: 'Premium wireless headphones with active noise cancellation for studying and entertainment.',
       features: ['Active Noise Cancellation', '30-hour Battery Life', 'Premium Sound Quality', 'Comfortable Design'],
       inStock: 15,
       isNew: false,
@@ -46,12 +55,12 @@ const EcommerceDemo = () => {
     {
       id: 2,
       name: 'Smart Fitness Watch',
-      price: 249,
+      price: 19999,
       image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
       rating: 4.6,
       reviews: 1924,
       category: 'Electronics',
-      description: 'Track your fitness goals with advanced health monitoring and GPS capabilities.',
+      description: 'Track your fitness goals with advanced health monitoring perfect for student life.',
       features: ['Heart Rate Monitor', 'GPS Tracking', 'Waterproof Design', '7-day Battery'],
       inStock: 23,
       isNew: true,
@@ -59,61 +68,276 @@ const EcommerceDemo = () => {
     },
     {
       id: 3,
-      name: 'Artisan Coffee Mug',
-      price: 24,
-      image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?w=400&h=400&fit=crop',
-      rating: 4.4,
-      reviews: 856,
-      category: 'Home',
-      description: 'Handcrafted ceramic mug perfect for your morning coffee ritual.',
-      features: ['Handcrafted Ceramic', 'Dishwasher Safe', 'Perfect Size', 'Elegant Design'],
+      name: 'Bluetooth Earbuds Pro',
+      price: 8999,
+      originalPrice: 12999,
+      image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=400&fit=crop',
+      rating: 4.5,
+      reviews: 3456,
+      category: 'Electronics',
+      description: 'Compact wireless earbuds perfect for lectures and commuting.',
+      features: ['25-hour Battery', 'Quick Charge', 'Touch Controls', 'Voice Assistant'],
+      inStock: 45,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 4,
+      name: 'Portable Bluetooth Speaker',
+      price: 4999,
+      image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop',
+      rating: 4.3,
+      reviews: 1876,
+      category: 'Electronics',
+      description: 'Compact speaker for dorm parties and study sessions.',
+      features: ['12-hour Battery', 'Waterproof', 'Deep Bass', 'Portable Design'],
       inStock: 67,
       isNew: false,
       isBestseller: false
     },
     {
-      id: 4,
-      name: 'Professional Running Shoes',
-      price: 159,
-      originalPrice: 199,
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
-      rating: 4.7,
-      reviews: 3241,
-      category: 'Fashion',
-      description: 'High-performance running shoes designed for serious athletes and casual runners alike.',
-      features: ['Responsive Cushioning', 'Breathable Material', 'Durable Construction', 'Lightweight Design'],
-      inStock: 42,
-      isNew: false,
-      isBestseller: true
-    },
-    {
       id: 5,
-      name: 'Premium Laptop Backpack',
-      price: 89,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop',
-      rating: 4.5,
-      reviews: 1567,
-      category: 'Accessories',
-      description: 'Stylish and functional backpack with dedicated laptop compartment and USB charging port.',
-      features: ['Laptop Protection', 'USB Charging Port', 'Water Resistant', 'Anti-theft Design'],
+      name: 'Gaming Mechanical Keyboard',
+      price: 7999,
+      originalPrice: 10999,
+      image: 'https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=400&fit=crop',
+      rating: 4.7,
+      reviews: 2341,
+      category: 'Electronics',
+      description: 'RGB mechanical keyboard perfect for coding and gaming.',
+      features: ['RGB Backlight', 'Mechanical Switches', 'Programmable Keys', 'Durable Build'],
       inStock: 34,
       isNew: true,
       isBestseller: false
     },
+    
+    // Books (25 products)
     {
       id: 6,
-      name: 'Flagship Smartphone',
+      name: 'Programming Fundamentals',
       price: 899,
-      originalPrice: 999,
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400&fit=crop',
+      rating: 4.8,
+      reviews: 5432,
+      category: 'Books',
+      description: 'Complete guide to programming concepts for computer science students.',
+      features: ['500+ Pages', 'Practical Examples', 'Exercise Solutions', 'Latest Edition'],
+      inStock: 120,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 7,
+      name: 'Data Structures & Algorithms',
+      price: 1299,
+      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
       rating: 4.9,
-      reviews: 5632,
-      category: 'Electronics',
-      description: 'Latest flagship smartphone with cutting-edge camera technology and lightning-fast performance.',
-      features: ['Professional Camera', '5G Connectivity', 'All-day Battery', 'Premium Display'],
-      inStock: 8,
+      reviews: 4567,
+      category: 'Books',
+      description: 'Master DSA concepts essential for technical interviews.',
+      features: ['Interview Prep', 'Code Examples', 'Problem Sets', 'Visual Diagrams'],
+      inStock: 89,
       isNew: true,
       isBestseller: true
+    },
+    {
+      id: 8,
+      name: 'Calculus Textbook',
+      price: 1599,
+      originalPrice: 1999,
+      image: 'https://images.unsplash.com/photo-1509266272358-7701da638078?w=400&h=400&fit=crop',
+      rating: 4.4,
+      reviews: 2134,
+      category: 'Books',
+      description: 'Comprehensive calculus textbook for engineering students.',
+      features: ['700+ Pages', 'Step-by-step Solutions', 'Practice Problems', 'Theory & Applications'],
+      inStock: 56,
+      isNew: false,
+      isBestseller: false
+    },
+    
+    // Stationery (30 products)
+    {
+      id: 9,
+      name: 'Professional Notebook Set',
+      price: 599,
+      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400&fit=crop',
+      rating: 4.5,
+      reviews: 1234,
+      category: 'Stationery',
+      description: 'High-quality notebooks perfect for taking lecture notes.',
+      features: ['Ruled Pages', 'Durable Cover', 'Set of 5', 'A4 Size'],
+      inStock: 234,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 10,
+      name: 'Gel Pen Set (20 Colors)',
+      price: 399,
+      image: 'https://images.unsplash.com/photo-1586281010691-1de8cbb8ae36?w=400&h=400&fit=crop',
+      rating: 4.2,
+      reviews: 876,
+      category: 'Stationery',
+      description: 'Vibrant gel pen set for colorful notes and diagrams.',
+      features: ['20 Colors', 'Smooth Writing', 'Quick Dry', 'Comfortable Grip'],
+      inStock: 156,
+      isNew: true,
+      isBestseller: false
+    },
+    
+    // Bags (20 products)
+    {
+      id: 11,
+      name: 'Premium Laptop Backpack',
+      price: 2999,
+      originalPrice: 3999,
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop',
+      rating: 4.6,
+      reviews: 1567,
+      category: 'Bags',
+      description: 'Stylish and functional backpack with dedicated laptop compartment.',
+      features: ['Laptop Protection', 'USB Charging Port', 'Water Resistant', 'Anti-theft Design'],
+      inStock: 78,
+      isNew: true,
+      isBestseller: true
+    },
+    {
+      id: 12,
+      name: 'College Messenger Bag',
+      price: 1499,
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop',
+      rating: 4.3,
+      reviews: 987,
+      category: 'Bags',
+      description: 'Classic messenger bag perfect for carrying books and essentials.',
+      features: ['Multiple Compartments', 'Adjustable Strap', 'Durable Canvas', 'Vintage Style'],
+      inStock: 92,
+      isNew: false,
+      isBestseller: false
+    },
+    
+    // Home & Living (25 products)
+    {
+      id: 13,
+      name: 'Study Desk Lamp',
+      price: 1799,
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      rating: 4.4,
+      reviews: 1456,
+      category: 'Home & Living',
+      description: 'LED desk lamp with adjustable brightness for late-night studies.',
+      features: ['LED Light', 'Adjustable Brightness', 'Touch Control', 'USB Port'],
+      inStock: 67,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 14,
+      name: 'Coffee Mug Set',
+      price: 799,
+      image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?w=400&h=400&fit=crop',
+      rating: 4.2,
+      reviews: 654,
+      category: 'Home & Living',
+      description: 'Ceramic coffee mug set perfect for your caffeine needs.',
+      features: ['Set of 4', 'Dishwasher Safe', 'Heat Resistant', 'Elegant Design'],
+      inStock: 123,
+      isNew: false,
+      isBestseller: false
+    },
+    
+    // Clothing (30 products)
+    {
+      id: 15,
+      name: 'Casual T-Shirt Pack',
+      price: 1299,
+      originalPrice: 1799,
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
+      rating: 4.3,
+      reviews: 2134,
+      category: 'Clothing',
+      description: 'Comfortable cotton t-shirts perfect for everyday wear.',
+      features: ['100% Cotton', 'Pack of 3', 'Multiple Colors', 'Comfortable Fit'],
+      inStock: 234,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 16,
+      name: 'Hooded Sweatshirt',
+      price: 1999,
+      image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop',
+      rating: 4.5,
+      reviews: 1876,
+      category: 'Clothing',
+      description: 'Warm and comfortable hoodie for chilly campus days.',
+      features: ['Soft Fabric', 'Kangaroo Pocket', 'Adjustable Hood', 'Machine Washable'],
+      inStock: 156,
+      isNew: true,
+      isBestseller: false
+    },
+    
+    // Sports & Fitness (20 products)
+    {
+      id: 17,
+      name: 'Yoga Mat Premium',
+      price: 1599,
+      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop',
+      rating: 4.6,
+      reviews: 1234,
+      category: 'Sports & Fitness',
+      description: 'Non-slip yoga mat perfect for dorm room workouts.',
+      features: ['Non-slip Surface', 'Extra Thick', 'Eco-friendly', 'Carrying Strap'],
+      inStock: 89,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 18,
+      name: 'Water Bottle Steel',
+      price: 899,
+      originalPrice: 1299,
+      image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=400&fit=crop',
+      rating: 4.4,
+      reviews: 876,
+      category: 'Sports & Fitness',
+      description: 'Insulated steel water bottle to stay hydrated on campus.',
+      features: ['24-hour Cold', '12-hour Hot', 'Leak Proof', 'BPA Free'],
+      inStock: 167,
+      isNew: true,
+      isBestseller: false
+    },
+    
+    // Tech Accessories (40 products)
+    {
+      id: 19,
+      name: 'Power Bank 20000mAh',
+      price: 2499,
+      image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=400&fit=crop',
+      rating: 4.7,
+      reviews: 3456,
+      category: 'Tech Accessories',
+      description: 'High-capacity power bank for all-day device charging.',
+      features: ['20000mAh Capacity', 'Fast Charging', 'Multiple Ports', 'LED Display'],
+      inStock: 78,
+      isNew: false,
+      isBestseller: true
+    },
+    {
+      id: 20,
+      name: 'USB-C Hub 7-in-1',
+      price: 3499,
+      originalPrice: 4499,
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
+      rating: 4.5,
+      reviews: 1987,
+      category: 'Tech Accessories',
+      description: 'Multi-port hub for laptop connectivity needs.',
+      features: ['7 Ports', 'HDMI Output', 'USB 3.0', 'Card Reader'],
+      inStock: 45,
+      isNew: true,
+      isBestseller: false
     }
   ]);
 
@@ -121,18 +345,31 @@ const EcommerceDemo = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>('INR');
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
 
-  const categories = ['All', 'Electronics', 'Fashion', 'Home', 'Accessories'];
+  const currencies: Record<string, Currency> = {
+    INR: { code: 'INR', symbol: '₹', rate: 1 },
+    USD: { code: 'USD', symbol: '$', rate: 0.012 },
+    EUR: { code: 'EUR', symbol: '€', rate: 0.011 },
+    GBP: { code: 'GBP', symbol: '£', rate: 0.0095 }
+  };
+
+  const categories = ['All', 'Electronics', 'Books', 'Stationery', 'Bags', 'Home & Living', 'Clothing', 'Sports & Fitness', 'Tech Accessories'];
+  const productsPerPage = 12;
 
   useEffect(() => {
     // Animate items on load
-    products.forEach((_, index) => {
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const endIndex = startIndex + productsPerPage;
+    filteredProducts.slice(startIndex, endIndex).forEach((_, index) => {
       setTimeout(() => {
-        setAnimatedItems(prev => [...prev, index]);
+        setAnimatedItems(prev => [...prev, startIndex + index]);
       }, index * 100);
     });
-  }, [products]);
+  }, [currentPage, selectedCategory, sortBy]);
 
   const addToCart = (product: Product) => {
     const existingItem = cart.find(item => item.id === product.id);
@@ -165,6 +402,12 @@ const EcommerceDemo = () => {
     );
   };
 
+  const formatPrice = (price: number) => {
+    const currency = currencies[selectedCurrency];
+    const convertedPrice = price * currency.rate;
+    return `${currency.symbol}${convertedPrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+  };
+
   const getTotalPrice = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
@@ -194,60 +437,78 @@ const EcommerceDemo = () => {
       }
     });
 
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setAnimatedItems([]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getCurrencyIcon = (currencyCode: string) => {
+    switch (currencyCode) {
+      case 'USD': return <DollarSign className="w-4 h-4" />;
+      case 'EUR': return <Euro className="w-4 h-4" />;
+      case 'INR': return <IndianRupee className="w-4 h-4" />;
+      default: return <IndianRupee className="w-4 h-4" />;
+    }
+  };
+
   return (
     <main className="min-h-screen pt-32 pb-16 bg-gradient-to-br from-purple-50 via-white to-violet-50">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           {/* Enhanced Hero Section */}
           <div className="text-center mb-16 relative overflow-hidden">
-            {/* Floating background elements */}
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-purple-200/30 rounded-full blur-xl animate-float"></div>
             <div className="absolute -top-5 -right-10 w-24 h-24 bg-violet-200/40 rounded-full blur-lg animate-float" style={{ animationDelay: '1s' }}></div>
             
             <div className="relative z-10">
               <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-purple-600 to-violet-600 text-white animate-bounce-in">
                 <Award className="w-4 h-4 mr-2" />
-                Premium E-commerce Experience
+                Student E-commerce Store
               </Badge>
               
               <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-purple animate-fade-in">
-                Modern Online Store
+                Campus Store
               </h1>
               
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                Experience the future of online shopping with our professionally designed e-commerce platform. 
-                Featuring advanced product filtering, secure checkout, real-time inventory tracking, and premium user experience.
+                Everything you need for your student life - from electronics and books to stationery and lifestyle products. 
+                Shop smart, study better!
               </p>
 
-              {/* Feature highlights */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12 animate-fade-in" style={{ animationDelay: '0.4s' }}>
                 <div className="glass-effect p-6 rounded-xl hover:purple-glow transition-all duration-300 group">
                   <Truck className="w-8 h-8 text-purple-600 mb-3 mx-auto group-hover:scale-110 transition-transform" />
-                  <h3 className="font-semibold mb-2">Free Shipping</h3>
-                  <p className="text-sm text-muted-foreground">Free delivery on orders over $50</p>
+                  <h3 className="font-semibold mb-2">Free Campus Delivery</h3>
+                  <p className="text-sm text-muted-foreground">Free delivery on orders over ₹500</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl hover:purple-glow transition-all duration-300 group">
                   <Shield className="w-8 h-8 text-violet-600 mb-3 mx-auto group-hover:scale-110 transition-transform" />
-                  <h3 className="font-semibold mb-2">Secure Payment</h3>
-                  <p className="text-sm text-muted-foreground">SSL encrypted secure checkout</p>
+                  <h3 className="font-semibold mb-2">Student Discounts</h3>
+                  <p className="text-sm text-muted-foreground">Special prices for students</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl hover:purple-glow transition-all duration-300 group">
                   <RefreshCw className="w-8 h-8 text-purple-600 mb-3 mx-auto group-hover:scale-110 transition-transform" />
                   <h3 className="font-semibold mb-2">Easy Returns</h3>
-                  <p className="text-sm text-muted-foreground">30-day hassle-free returns</p>
+                  <p className="text-sm text-muted-foreground">7-day hassle-free returns</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Filters and Search */}
+          {/* Filters and Controls */}
           <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <div className="glass-effect p-6 rounded-xl">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
                 <div className="flex flex-col sm:flex-row gap-4 items-center">
                   <div className="flex items-center gap-2">
                     <Filter className="w-5 h-5 text-purple-600" />
-                    <span className="font-medium">Filter by Category:</span>
+                    <span className="font-medium">Category:</span>
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                     <SelectTrigger className="w-48">
@@ -261,34 +522,64 @@ const EcommerceDemo = () => {
                   </Select>
                 </div>
                 
-                <div className="flex items-center gap-4">
-                  <span className="font-medium">Sort by:</span>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="featured">Featured</SelectItem>
-                      <SelectItem value="price-low">Price: Low to High</SelectItem>
-                      <SelectItem value="price-high">Price: High to Low</SelectItem>
-                      <SelectItem value="rating">Highest Rated</SelectItem>
-                      <SelectItem value="newest">Newest First</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Currency:</span>
+                    <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(currencies).map(([code, currency]) => (
+                          <SelectItem key={code} value={code}>
+                            <div className="flex items-center gap-2">
+                              {getCurrencyIcon(code)}
+                              {code}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Sort:</span>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="featured">Featured</SelectItem>
+                        <SelectItem value="price-low">Price: Low to High</SelectItem>
+                        <SelectItem value="price-high">Price: High to Low</SelectItem>
+                        <SelectItem value="rating">Highest Rated</SelectItem>
+                        <SelectItem value="newest">Newest First</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Enhanced Products Grid */}
+            {/* Products Grid */}
             <div className="lg:col-span-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {filteredProducts.map((product, index) => (
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-muted-foreground">
+                  Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">
+                {currentProducts.map((product, index) => (
                   <Card 
                     key={product.id} 
                     className={`group overflow-hidden hover:shadow-2xl hover:shadow-purple-200/50 transition-all duration-500 hover:-translate-y-2 border-0 glass-effect ${
-                      animatedItems.includes(index) ? 'animate-fade-in' : 'opacity-0'
+                      animatedItems.includes(startIndex + index) ? 'animate-fade-in' : 'opacity-0'
                     }`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
@@ -370,8 +661,8 @@ const EcommerceDemo = () => {
                       {/* Features */}
                       <div className="mb-4">
                         <h4 className="text-sm font-medium mb-2">Key Features:</h4>
-                        <div className="grid grid-cols-2 gap-1">
-                          {product.features.slice(0, 4).map((feature, idx) => (
+                        <div className="grid grid-cols-1 gap-1">
+                          {product.features.slice(0, 2).map((feature, idx) => (
                             <div key={idx} className="text-xs text-muted-foreground flex items-center">
                               <div className="w-1 h-1 bg-purple-500 rounded-full mr-2"></div>
                               {feature}
@@ -384,14 +675,14 @@ const EcommerceDemo = () => {
                       <div className="flex justify-between items-center">
                         <div className="flex flex-col">
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-green-600">${product.price}</span>
+                            <span className="text-2xl font-bold text-green-600">{formatPrice(product.price)}</span>
                             {product.originalPrice && (
-                              <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
+                              <span className="text-sm text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>
                             )}
                           </div>
                           {product.originalPrice && (
                             <span className="text-xs text-green-600 font-medium">
-                              Save ${product.originalPrice - product.price}
+                              Save {formatPrice(product.originalPrice - product.price)}
                             </span>
                           )}
                         </div>
@@ -409,9 +700,73 @@ const EcommerceDemo = () => {
                   </Card>
                 ))}
               </div>
+
+              {/* Pagination */}
+              <div className="flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {/* First page */}
+                    {currentPage > 3 && (
+                      <>
+                        <PaginationItem>
+                          <PaginationLink onClick={() => handlePageChange(1)} className="cursor-pointer">
+                            1
+                          </PaginationLink>
+                        </PaginationItem>
+                        {currentPage > 4 && <PaginationEllipsis />}
+                      </>
+                    )}
+                    
+                    {/* Current page and surrounding pages */}
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                      if (page <= totalPages) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink 
+                              onClick={() => handlePageChange(page)}
+                              isActive={page === currentPage}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+                      return null;
+                    })}
+                    
+                    {/* Last page */}
+                    {currentPage < totalPages - 2 && (
+                      <>
+                        {currentPage < totalPages - 3 && <PaginationEllipsis />}
+                        <PaginationItem>
+                          <PaginationLink onClick={() => handlePageChange(totalPages)} className="cursor-pointer">
+                            {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      </>
+                    )}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
             </div>
 
-            {/* Enhanced Shopping Cart */}
+            {/* Shopping Cart */}
             <div className="lg:col-span-1">
               <Card className="sticky top-32 glass-effect border-0 shadow-xl">
                 <CardHeader className="bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-t-lg">
@@ -440,9 +795,9 @@ const EcommerceDemo = () => {
                           />
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-sm truncate">{item.name}</h4>
-                            <p className="text-green-600 font-bold">${item.price}</p>
+                            <p className="text-green-600 font-bold">{formatPrice(item.price)}</p>
                             <p className="text-xs text-muted-foreground">
-                              ${(item.price * item.quantity).toFixed(2)} total
+                              {formatPrice(item.price * item.quantity)} total
                             </p>
                           </div>
                           <div className="flex flex-col items-center gap-2">
@@ -473,34 +828,37 @@ const EcommerceDemo = () => {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Subtotal:</span>
-                            <span>${getTotalPrice().toFixed(2)}</span>
+                            <span>{formatPrice(getTotalPrice())}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span>Shipping:</span>
                             <span className="text-green-600">Free</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span>Tax:</span>
-                            <span>${(getTotalPrice() * 0.08).toFixed(2)}</span>
+                            <span>Tax (18% GST):</span>
+                            <span>{formatPrice(getTotalPrice() * 0.18)}</span>
                           </div>
                           <div className="border-t pt-2">
                             <div className="flex justify-between items-center">
                               <span className="font-semibold">Total:</span>
                               <span className="text-2xl font-bold text-green-600">
-                                ${(getTotalPrice() * 1.08).toFixed(2)}
+                                {formatPrice(getTotalPrice() * 1.18)}
                               </span>
                             </div>
                           </div>
                         </div>
                         
-                        <Button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-3 text-lg font-semibold">
-                          Secure Checkout
+                        <Button 
+                          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-3 text-lg font-semibold"
+                          onClick={() => setIsPaymentModalOpen(true)}
+                        >
+                          Proceed to Payment
                         </Button>
                         
                         <div className="text-center">
                           <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                             <Shield className="w-3 h-3" />
-                            SSL Secured Payment
+                            100% Secure Payment
                           </p>
                         </div>
                       </div>
@@ -510,110 +868,16 @@ const EcommerceDemo = () => {
               </Card>
             </div>
           </div>
-
-          {/* Project Information Section */}
-          <div className="mt-20 animate-fade-in">
-            <Card className="glass-effect border-0 shadow-xl">
-              <CardHeader className="text-center">
-                <CardTitle className="text-3xl text-gradient-purple mb-4">
-                  About This E-commerce Demo
-                </CardTitle>
-                <CardDescription className="text-lg max-w-4xl mx-auto">
-                  This professional e-commerce platform demonstrates modern web development practices and advanced user experience design.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  <div className="text-center p-6 hover:bg-purple-50/50 rounded-xl transition-colors">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Search className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Advanced Filtering</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Smart product filtering by category, price, rating, and availability with real-time search functionality.
-                    </p>
-                  </div>
-                  
-                  <div className="text-center p-6 hover:bg-purple-50/50 rounded-xl transition-colors">
-                    <div className="w-16 h-16 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ShoppingCart className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Smart Cart System</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Intelligent shopping cart with quantity management, real-time price calculation, and persistent storage.
-                    </p>
-                  </div>
-                  
-                  <div className="text-center p-6 hover:bg-purple-50/50 rounded-xl transition-colors">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Heart className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Wishlist & Favorites</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Save favorite products for later with animated heart icons and persistent wishlist storage.
-                    </p>
-                  </div>
-                  
-                  <div className="text-center p-6 hover:bg-purple-50/50 rounded-xl transition-colors">
-                    <div className="w-16 h-16 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Star className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Product Reviews</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Comprehensive rating system with visual star ratings and detailed customer review counts.
-                    </p>
-                  </div>
-                  
-                  <div className="text-center p-6 hover:bg-purple-50/50 rounded-xl transition-colors">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Shield className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Secure Checkout</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Professional checkout process with SSL encryption, tax calculation, and secure payment integration.
-                    </p>
-                  </div>
-                  
-                  <div className="text-center p-6 hover:bg-purple-50/50 rounded-xl transition-colors">
-                    <div className="w-16 h-16 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Truck className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Inventory Management</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Real-time stock tracking with low inventory alerts and automatic availability updates.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mt-12 p-8 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl">
-                  <h3 className="text-2xl font-bold text-center mb-6 text-gradient-purple">
-                    Technologies & Features Used
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                      'React + TypeScript',
-                      'Tailwind CSS',
-                      'Advanced Animations',
-                      'Responsive Design',
-                      'State Management',
-                      'Component Architecture',
-                      'Performance Optimization',
-                      'Modern UI/UX'
-                    ].map((tech, index) => (
-                      <Badge 
-                        key={tech} 
-                        className="p-3 bg-white text-purple-700 hover:bg-purple-100 transition-colors justify-center"
-                      >
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal 
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        total={formatPrice(getTotalPrice() * 1.18)}
+        currency={selectedCurrency}
+      />
     </main>
   );
 };
