@@ -42,10 +42,8 @@ const Projects = () => {
 
   return (
     <main className="min-h-screen pt-32 pb-16 relative overflow-hidden">
-      {/* Background Elements */}
+      {/* Simplified Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 pointer-events-none" />
-      <div className="absolute top-20 right-10 w-72 h-72 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-br from-accent/15 to-primary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto">
@@ -73,7 +71,7 @@ const Projects = () => {
             {/* Stats Section */}
             <ScrollAnimation animation="fade-up" delay={400}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/20">
+                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border border-primary/20">
                   <div className="flex items-center gap-3 mb-2">
                     <TrendingUp className="w-6 h-6 text-primary" />
                     <span className="text-2xl font-bold text-primary">4+</span>
@@ -81,7 +79,7 @@ const Projects = () => {
                   <p className="text-sm text-muted-foreground">Live Projects</p>
                 </div>
                 
-                <div className="bg-gradient-to-br from-accent/10 to-primary/10 backdrop-blur-sm rounded-2xl p-6 border border-accent/20">
+                <div className="bg-gradient-to-br from-accent/10 to-primary/10 rounded-2xl p-6 border border-accent/20">
                   <div className="flex items-center gap-3 mb-2">
                     <Users className="w-6 h-6 text-accent" />
                     <span className="text-2xl font-bold text-accent">1000+</span>
@@ -89,7 +87,7 @@ const Projects = () => {
                   <p className="text-sm text-muted-foreground">Users Reached</p>
                 </div>
                 
-                <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/20">
+                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border border-primary/20">
                   <div className="flex items-center gap-3 mb-2">
                     <Star className="w-6 h-6 text-primary" />
                     <span className="text-2xl font-bold text-primary">10+</span>
@@ -107,22 +105,11 @@ const Projects = () => {
                 key={project.title} 
                 animation="fade-up" 
                 delay={100 + index * 150}
-                className="group"
               >
-                <div className="relative">
-                  {/* Card Background Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-110" />
-                  
-                  {/* Project Card */}
-                  <div className="relative bg-background/95 backdrop-blur-xl rounded-2xl p-1 border border-primary/20 hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 group-hover:-translate-y-2">
-                    <div className="bg-gradient-to-br from-background to-secondary/30 rounded-xl overflow-hidden">
-                      <ProjectCard {...project} />
-                    </div>
+                <div className="bg-background/95 rounded-2xl p-1 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
+                  <div className="bg-gradient-to-br from-background to-secondary/30 rounded-xl overflow-hidden">
+                    <ProjectCard {...project} />
                   </div>
-                  
-                  {/* Floating Elements */}
-                  <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-br from-primary to-accent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
-                  <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-gradient-to-br from-accent to-primary rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 animate-bounce" />
                 </div>
               </ScrollAnimation>
             ))}
@@ -130,7 +117,7 @@ const Projects = () => {
 
           {/* Call to Action */}
           <ScrollAnimation animation="fade-up" delay={800} className="text-center mt-16">
-            <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm rounded-3xl p-8 border border-primary/20">
+            <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8 border border-primary/20">
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Interested in Working Together?
               </h3>
@@ -139,7 +126,7 @@ const Projects = () => {
               </p>
               <a 
                 href="/contact" 
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-full font-medium hover:scale-105 transition-transform duration-300 hover:shadow-lg hover:shadow-primary/30"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-full font-medium hover:scale-105 transition-transform duration-300"
               >
                 Get In Touch
                 <Star className="w-4 h-4" />
