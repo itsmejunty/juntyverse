@@ -19,16 +19,25 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
   const handleGitHubClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('GitHub button clicked, URL:', githubUrl);
+    console.log('GitHub button clicked for:', title);
+    console.log('GitHub URL:', githubUrl);
     
     if (githubUrl) {
-      // Ensure the URL starts with http:// or https://
-      let url = githubUrl;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = `https://${url}`;
+      try {
+        // Open the GitHub URL directly
+        const newWindow = window.open(githubUrl, '_blank', 'noopener,noreferrer');
+        if (!newWindow) {
+          console.error('Failed to open GitHub URL - popup blocked');
+          // Fallback: try to navigate directly
+          window.location.href = githubUrl;
+        } else {
+          console.log('Successfully opened GitHub URL');
+        }
+      } catch (error) {
+        console.error('Error opening GitHub URL:', error);
       }
-      console.log('Opening URL:', url);
-      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      console.error('No GitHub URL provided');
     }
   };
 
@@ -67,7 +76,7 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
             variant="outline" 
             size="sm"
             onClick={handleGitHubClick}
-            className="transition-all duration-200 hover:scale-105"
+            className="transition-all duration-200 hover:scale-105 cursor-pointer"
             type="button"
           >
             <Github className="h-4 w-4 mr-1" />

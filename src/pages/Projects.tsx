@@ -10,7 +10,7 @@ const Projects = () => {
       description: "A React-based web app fetching weather data via OpenWeatherMap API to display current conditions and forecasts. Features include location search, 5-day forecast, and responsive design for all device sizes.",
       image: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&q=80&w=1974",
       technologies: ["React", "JavaScript", "CSS", "OpenWeatherMap API"],
-      githubUrl: "https://github.com/yourusername/weather-dashboard",
+      githubUrl: "https://github.com/itsmejunty/weather-dashboard",
       liveUrl: "/demo/weather"
     },
     {
@@ -18,7 +18,7 @@ const Projects = () => {
       description: "An interactive portfolio website builder that helps users create professional portfolio websites. Features real-time preview, theme selection, content management, and code export functionality.",
       image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&q=80&w=2069",
       technologies: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
-      githubUrl: "https://github.com/yourusername/portfolio-builder",
+      githubUrl: "https://github.com/itsmejunty/portfolio-builder",
       liveUrl: "/demo/portfolio"
     },
     {
@@ -26,7 +26,7 @@ const Projects = () => {
       description: "A full-stack application for managing tasks and projects. Features include task creation, assignment, status tracking, and team collaboration tools.",
       image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&q=80&w=2070",
       technologies: ["React", "Node.js", "Express", "MongoDB"],
-      githubUrl: "https://github.com/yourusername/task-management",
+      githubUrl: "https://github.com/itsmejunty/task-management-app",
       liveUrl: "/demo/tasks"
     },
     {
@@ -34,7 +34,7 @@ const Projects = () => {
       description: "A fictional e-commerce platform with product listings, shopping cart, and checkout process. Integrated with mock payment processing and order management.",
       image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=2070",
       technologies: ["React", "Redux", "CSS", "Firebase"],
-      githubUrl: "https://github.com/yourusername/ecommerce-store",
+      githubUrl: "https://github.com/itsmejunty/ecommerce-platform",
       liveUrl: "/demo/ecommerce"
     }
   ];
