@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Github } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface ProjectCardProps {
@@ -16,6 +16,19 @@ export interface ProjectCardProps {
 }
 
 const ProjectCard = ({ title, description, image, technologies, liveUrl, githubUrl }: ProjectCardProps) => {
+  const handleGitHubClick = () => {
+    if (githubUrl) {
+      window.open(githubUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handleLiveDemoClick = (e: React.MouseEvent) => {
+    if (liveUrl?.startsWith('http')) {
+      e.preventDefault();
+      window.open(liveUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <Card className="overflow-hidden border border-border/40 transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <div className="aspect-video w-full overflow-hidden">
@@ -40,19 +53,34 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
       </CardContent>
       <CardFooter className="flex gap-2">
         {githubUrl && (
-          <a href={githubUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm">
-              GitHub
-            </Button>
-          </a>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleGitHubClick}
+            className="transition-all duration-200 hover:scale-105"
+          >
+            <Github className="h-4 w-4 mr-1" />
+            GitHub
+          </Button>
         )}
         {liveUrl && (
-          <Link to={liveUrl}>
-            <Button size="sm" className="group">
+          liveUrl.startsWith('http') ? (
+            <Button 
+              size="sm" 
+              className="group transition-all duration-200 hover:scale-105"
+              onClick={handleLiveDemoClick}
+            >
               Live Demo
               <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Button>
-          </Link>
+          ) : (
+            <Link to={liveUrl}>
+              <Button size="sm" className="group transition-all duration-200 hover:scale-105">
+                Live Demo
+                <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Button>
+            </Link>
+          )
         )}
       </CardFooter>
     </Card>

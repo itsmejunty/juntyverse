@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Hero from '@/components/Hero';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
@@ -14,7 +13,7 @@ const projects: ProjectCardProps[] = [
     description: "An interactive portfolio website builder that helps users create professional portfolio websites with real-time preview and code export.",
     image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&q=80&w=2069",
     technologies: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
-    githubUrl: "https://github.com/",
+    githubUrl: "https://github.com/yourusername/portfolio-builder",
     liveUrl: "/demo/portfolio"
   },
   {
@@ -22,7 +21,7 @@ const projects: ProjectCardProps[] = [
     description: "A React-based web app fetching weather data via OpenWeatherMap API to display current conditions and forecasts.",
     image: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&q=80&w=1974",
     technologies: ["React", "JavaScript", "CSS", "APIs"],
-    githubUrl: "https://github.com/",
+    githubUrl: "https://github.com/yourusername/weather-dashboard",
     liveUrl: "/demo/weather"
   }
 ];
