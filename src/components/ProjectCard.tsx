@@ -16,9 +16,19 @@ export interface ProjectCardProps {
 }
 
 const ProjectCard = ({ title, description, image, technologies, liveUrl, githubUrl }: ProjectCardProps) => {
-  const handleGitHubClick = () => {
+  const handleGitHubClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('GitHub button clicked, URL:', githubUrl);
+    
     if (githubUrl) {
-      window.open(githubUrl, '_blank', 'noopener,noreferrer');
+      // Ensure the URL starts with http:// or https://
+      let url = githubUrl;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = `https://${url}`;
+      }
+      console.log('Opening URL:', url);
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -58,6 +68,7 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
             size="sm"
             onClick={handleGitHubClick}
             className="transition-all duration-200 hover:scale-105"
+            type="button"
           >
             <Github className="h-4 w-4 mr-1" />
             GitHub
@@ -69,6 +80,7 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
               size="sm" 
               className="group transition-all duration-200 hover:scale-105"
               onClick={handleLiveDemoClick}
+              type="button"
             >
               Live Demo
               <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
