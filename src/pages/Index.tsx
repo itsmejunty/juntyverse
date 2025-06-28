@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Hero from '@/components/Hero';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
@@ -13,16 +14,134 @@ const projects: ProjectCardProps[] = [
     description: "An interactive portfolio website builder that helps users create professional portfolio websites with real-time preview and code export.",
     image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&q=80&w=2069",
     technologies: ["React", "TypeScript", "Tailwind CSS", "Responsive Design"],
-    githubUrl: "https://github.com/itsmejunty/portfolio-builder",
-    liveUrl: "/demo/portfolio"
+    liveUrl: "/demo/portfolio",
+    projectCode: `import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+
+interface PersonalInfo {
+  name: string;
+  title: string;
+  bio: string;
+}
+
+const PortfolioBuilder = () => {
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
+    name: 'John Doe',
+    title: 'Full Stack Developer',
+    bio: 'Passionate developer with experience in modern web technologies.'
+  });
+
+  const [previewMode, setPreviewMode] = useState(false);
+
+  if (previewMode) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <Button onClick={() => setPreviewMode(false)} className="mb-4">
+          Exit Preview
+        </Button>
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-2">{personalInfo.name}</h1>
+          <p className="text-xl text-gray-600 mb-4">{personalInfo.title}</p>
+          <p className="text-gray-700">{personalInfo.bio}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Portfolio Builder</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input
+            placeholder="Full Name"
+            value={personalInfo.name}
+            onChange={(e) => setPersonalInfo({...personalInfo, name: e.target.value})}
+          />
+          <Input
+            placeholder="Professional Title"
+            value={personalInfo.title}
+            onChange={(e) => setPersonalInfo({...personalInfo, title: e.target.value})}
+          />
+          <Textarea
+            placeholder="Bio"
+            value={personalInfo.bio}
+            onChange={(e) => setPersonalInfo({...personalInfo, bio: e.target.value})}
+          />
+          <Button onClick={() => setPreviewMode(true)} className="w-full">
+            Preview Portfolio
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};`
   },
   {
     title: "Weather Dashboard",
     description: "A React-based web app fetching weather data via OpenWeatherMap API to display current conditions and forecasts.",
     image: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&q=80&w=1974",
     technologies: ["React", "JavaScript", "CSS", "APIs"],
-    githubUrl: "https://github.com/itsmejunty/weather-dashboard",
-    liveUrl: "/demo/weather"
+    liveUrl: "/demo/weather",
+    projectCode: `import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+const WeatherDashboard = () => {
+  const [weather, setWeather] = useState(null);
+  const [city, setCity] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const fetchWeather = async (cityName) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        \`https://api.openweathermap.org/data/2.5/weather?q=\${cityName}&appid=YOUR_API_KEY&units=metric\`
+      );
+      const data = await response.json();
+      setWeather(data);
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="max-w-md mx-auto p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Weather Dashboard</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter city name"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
+            <Button onClick={() => fetchWeather(city)} disabled={loading}>
+              {loading ? 'Loading...' : 'Search'}
+            </Button>
+          </div>
+          
+          {weather && (
+            <div className="text-center">
+              <h3 className="text-2xl font-bold">{weather.name}</h3>
+              <p className="text-4xl">{Math.round(weather.main.temp)}°C</p>
+              <p className="text-gray-600">{weather.weather[0].description}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};`
   }
 ];
 

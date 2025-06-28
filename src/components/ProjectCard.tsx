@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight, Github } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ArrowUpRight, Code, Copy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface ProjectCardProps {
@@ -12,39 +14,24 @@ export interface ProjectCardProps {
   image: string;
   technologies: string[];
   liveUrl?: string;
-  githubUrl?: string;
+  projectCode?: string;
 }
 
-const ProjectCard = ({ title, description, image, technologies, liveUrl, githubUrl }: ProjectCardProps) => {
-  const handleGitHubClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('GitHub button clicked for:', title);
-    console.log('GitHub URL:', githubUrl);
-    
-    if (githubUrl) {
-      try {
-        // Open the GitHub URL directly
-        const newWindow = window.open(githubUrl, '_blank', 'noopener,noreferrer');
-        if (!newWindow) {
-          console.error('Failed to open GitHub URL - popup blocked');
-          // Fallback: try to navigate directly
-          window.location.href = githubUrl;
-        } else {
-          console.log('Successfully opened GitHub URL');
-        }
-      } catch (error) {
-        console.error('Error opening GitHub URL:', error);
-      }
-    } else {
-      console.error('No GitHub URL provided');
-    }
-  };
+const ProjectCard = ({ title, description, image, technologies, liveUrl, projectCode }: ProjectCardProps) => {
+  const [copied, setCopied] = useState(false);
 
   const handleLiveDemoClick = (e: React.MouseEvent) => {
     if (liveUrl?.startsWith('http')) {
       e.preventDefault();
       window.open(liveUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handleCopyCode = () => {
+    if (projectCode) {
+      navigator.clipboard.writeText(projectCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -71,17 +58,41 @@ const ProjectCard = ({ title, description, image, technologies, liveUrl, githubU
         <p className="text-muted-foreground">{description}</p>
       </CardContent>
       <CardFooter className="flex gap-2">
-        {githubUrl && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleGitHubClick}
-            className="transition-all duration-200 hover:scale-105 cursor-pointer"
-            type="button"
-          >
-            <Github className="h-4 w-4 mr-1" />
-            GitHub
-          </Button>
+        {projectCode && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="transition-all duration-200 hover:scale-105 cursor-pointer"
+                type="button"
+              >
+                <Code className="h-4 w-4 mr-1" />
+                Project Code
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center justify-between">
+                  <span>{title} - Project Code</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyCode}
+                    className="transition-all duration-200 hover:scale-105"
+                  >
+                    <Copy className="h-4 w-4 mr-1" />
+                    {copied ? 'Copied!' : 'Copy Code'}
+                  </Button>
+                </DialogTitle>
+              </DialogHeader>
+              <ScrollArea className="h-[60vh] w-full">
+                <pre className="bg-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
+                  <code>{projectCode}</code>
+                </pre>
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
         )}
         {liveUrl && (
           liveUrl.startsWith('http') ? (
