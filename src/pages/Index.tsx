@@ -3,6 +3,7 @@ import React from 'react';
 import Hero from '@/components/Hero';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
 import SkillsSection from '@/components/SkillsSection';
+import ProblemSolvingShowcase from '@/components/ProblemSolvingShowcase';
 import EnhancedButton from '@/components/EnhancedButton';
 import ScrollAnimation from '@/components/ScrollAnimation';
 import { ArrowRight, Sparkles, Code, Globe, Database } from 'lucide-react';
@@ -149,6 +150,9 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-white via-purple-50/30 to-violet-50/50">
       <Hero />
+      
+      {/* Problem Solving Showcase - New section */}
+      <ProblemSolvingShowcase />
       
       {/* Enhanced Featured Projects with purple theme */}
       <section className="py-20 section-gradient relative overflow-hidden">
