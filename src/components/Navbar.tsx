@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import DarkModeToggle from './DarkModeToggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,6 +36,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Projects', path: '/projects' },
+    { name: 'Blog', path: '/blog' },
     { name: 'Contact', path: '/contact' },
   ];
 
@@ -62,18 +64,22 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <a
-              href="/Jadidya_Resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block"
-            >
-              <Button>Resume</Button>
-            </a>
+            <div className="flex items-center space-x-4">
+              <DarkModeToggle />
+              <a
+                href="/Jadidya_Resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block"
+              >
+                <Button>Resume</Button>
+              </a>
+            </div>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile menu button and dark mode toggle */}
+          <div className="md:hidden flex items-center space-x-2">
+            <DarkModeToggle />
             <Button variant="ghost" size="icon" onClick={toggleMenu} aria-label="Toggle menu">
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>

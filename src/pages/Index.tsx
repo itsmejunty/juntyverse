@@ -1,11 +1,12 @@
+
 import React from 'react';
 import Hero from '@/components/Hero';
 import ProjectCard, { ProjectCardProps } from '@/components/ProjectCard';
 import SkillsSection from '@/components/SkillsSection';
 import ProblemSolvingShowcase from '@/components/ProblemSolvingShowcase';
+import TestimonialsMetrics from '@/components/TestimonialsMetrics';
 import EnhancedButton from '@/components/EnhancedButton';
 import ScrollAnimation from '@/components/ScrollAnimation';
-import DarkModeToggle from '@/components/DarkModeToggle';
 import { ArrowRight, Sparkles, Code, Globe, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -149,11 +150,6 @@ const WeatherDashboard = () => {
 const Index = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-white via-purple-50/30 to-violet-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20 transition-colors duration-300">
-      {/* Dark Mode Toggle - Fixed position */}
-      <div className="fixed top-4 right-4 z-50 md:hidden">
-        <DarkModeToggle />
-      </div>
-
       <Hero />
       
       {/* Problem Solving Showcase */}
@@ -211,6 +207,9 @@ const Index = () => {
       <ScrollAnimation animation="fade-up" delay={100}>
         <SkillsSection />
       </ScrollAnimation>
+      
+      {/* Testimonials and Metrics */}
+      <TestimonialsMetrics />
       
       {/* Enhanced CTA Section with dark mode support */}
       <section className="py-20 bg-gradient-to-br from-purple-50/50 via-white to-violet-50/30 dark:from-gray-900/50 dark:via-gray-800 dark:to-purple-900/20 relative overflow-hidden">
