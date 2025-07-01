@@ -1,105 +1,105 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import AboutMeSection from '@/components/AboutMeSection';
+import ScrollAnimation from '@/components/ScrollAnimation';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { GraduationCap, Award, Calendar } from 'lucide-react';
 
 const About = () => {
   return (
-    <main className="min-h-screen pt-32 pb-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8">About Me</h1>
-          
-          <div className="space-y-8">
-            <div>
-              <p className="text-lg leading-relaxed mb-4">
-                Hello! I'm Jadidya, a recent B.Tech graduate in Computer Science from Mallareddy College of Engineering. 
-                I'm passionate about building intuitive, efficient web applications that solve real-world problems.
-              </p>
-              
-              <p className="text-lg leading-relaxed mb-4">
-                My focus is on front-end and full-stack development, particularly using React and Node.js. 
-                I enjoy the challenge of turning complex problems into simple, beautiful solutions.
-              </p>
-              
-              <p className="text-lg leading-relaxed">
-                In the short term, my goal is to join a collaborative development team where I can build meaningful applications while refining my skills. 
-                Looking ahead, I aspire to grow into a senior developer or technical lead role with expertise in system design and DevOps practices.
-              </p>
-            </div>
+    <main className="min-h-screen pt-20">
+      {/* Enhanced About Me Section */}
+      <AboutMeSection />
+      
+      {/* Education & Certifications */}
+      <section className="py-16 bg-gradient-to-br from-secondary/30 to-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <ScrollAnimation animation="fade-up" delay={100}>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Education & <span className="text-gradient-purple">Certifications</span>
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  My academic journey and professional development
+                </p>
+              </div>
+            </ScrollAnimation>
             
             {/* Education */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Education</h2>
-              <div className="border border-border/40 rounded-lg p-6">
-                <div className="flex flex-wrap justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-medium">B.Tech in Computer Science</h3>
-                    <p className="text-muted-foreground">Mallareddy College of Engineering</p>
-                  </div>
-                  <Badge variant="outline">2024</Badge>
-                </div>
+            <ScrollAnimation animation="fade-up" delay={200}>
+              <div className="mb-12">
+                <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                  <GraduationCap className="w-6 h-6 text-primary" />
+                  Education
+                </h3>
+                <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                      <div className="flex-1">
+                        <h4 className="text-xl font-semibold mb-2">B.Tech in Computer Science</h4>
+                        <p className="text-primary font-medium mb-2">Mallareddy College of Engineering</p>
+                        <p className="text-muted-foreground">
+                          Comprehensive study of computer science fundamentals including algorithms, 
+                          data structures, software engineering, and modern programming languages.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <Badge variant="outline" className="text-lg px-3 py-1">2024</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
+            </ScrollAnimation>
             
             {/* Certifications */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Certifications</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-border/40 rounded-lg p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">Python Complete Course For Python Beginners</h3>
-                      <p className="text-muted-foreground">Udemy</p>
-                    </div>
-                    <Badge variant="outline">2024</Badge>
-                  </div>
-                </div>
-                
-                <div className="border border-border/40 rounded-lg p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">Python Full Stack Development</h3>
-                      <p className="text-muted-foreground">Offline Course</p>
-                    </div>
-                    <Badge variant="outline">2024</Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Interests */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Interests & Hobbies</h2>
-              <div className="flex flex-wrap gap-3">
-                <div className="px-4 py-2 bg-accent/10 rounded-md text-accent-foreground">
-                  Gaming
-                </div>
-                <div className="px-4 py-2 bg-accent/10 rounded-md text-accent-foreground">
-                  Fitness
-                </div>
-                <div className="px-4 py-2 bg-accent/10 rounded-md text-accent-foreground">
-                  Technology
-                </div>
-                <div className="px-4 py-2 bg-accent/10 rounded-md text-accent-foreground">
-                  Continuous Learning
+            <ScrollAnimation animation="fade-up" delay={300}>
+              <div>
+                <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                  <Award className="w-6 h-6 text-primary" />
+                  Certifications
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                          <Award className="w-6 h-6 text-white" />
+                        </div>
+                        <Badge variant="outline">2024</Badge>
+                      </div>
+                      <h4 className="font-semibold mb-2">Python Complete Course For Python Beginners</h4>
+                      <p className="text-sm text-primary mb-2">Udemy</p>
+                      <p className="text-sm text-muted-foreground">
+                        Comprehensive Python programming fundamentals, data structures, and practical applications.
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-lg flex items-center justify-center">
+                          <Award className="w-6 h-6 text-white" />
+                        </div>
+                        <Badge variant="outline">2024</Badge>
+                      </div>
+                      <h4 className="font-semibold mb-2">Python Full Stack Development</h4>
+                      <p className="text-sm text-accent mb-2">Offline Course</p>
+                      <p className="text-sm text-muted-foreground">
+                        Advanced full-stack development with Python, web frameworks, and database integration.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
-            </div>
-            
-            {/* Resume */}
-            <div className="pt-6">
-              <a href="/Jadidya_Resume.pdf" target="_blank" rel="noopener noreferrer">
-                <Button className="group">
-                  Download Resume
-                  <Download className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-0.5" />
-                </Button>
-              </a>
-            </div>
+            </ScrollAnimation>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 };

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Download } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 
 const Navbar = () => {
@@ -44,6 +44,16 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
+  const handleResumeDownload = () => {
+    const link = document.createElement('a');
+    link.href = '/Jadidya_Resume.pdf';
+    link.download = 'Jadidya_Resume.pdf';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-background/80 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-4">
@@ -66,14 +76,13 @@ const Navbar = () => {
             ))}
             <div className="flex items-center space-x-4">
               <DarkModeToggle />
-              <a
-                href="/Jadidya_Resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block"
+              <Button
+                onClick={handleResumeDownload}
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300 hover:scale-105 group"
               >
-                <Button>Resume</Button>
-              </a>
+                <Download className="w-4 h-4 mr-2 transition-transform group-hover:translate-y-0.5" />
+                Resume
+              </Button>
             </div>
           </div>
 
@@ -99,14 +108,13 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <a
-                href="/Jadidya_Resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block"
+              <Button
+                onClick={handleResumeDownload}
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300 group justify-start"
               >
-                <Button>Resume</Button>
-              </a>
+                <Download className="w-4 h-4 mr-2 transition-transform group-hover:translate-y-0.5" />
+                Download Resume
+              </Button>
             </div>
           </div>
         )}
