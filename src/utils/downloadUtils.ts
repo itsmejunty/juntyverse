@@ -35,324 +35,219 @@ export const downloadResume = async () => {
 const generateProfessionalPDF = () => {
   const doc = new jsPDF();
   
-  // Professional color scheme - Navy blue, gray, and white
-  const primaryBlue = [34, 67, 120]; // Professional navy blue
-  const lightBlue = [70, 130, 180]; // Steel blue for accents
-  const darkGray = [64, 64, 64]; // Professional dark gray
-  const mediumGray = [102, 102, 102]; // Medium gray for secondary text
-  const lightGray = [128, 128, 128]; // Light gray for subtle elements
+  // Set page margins
+  const leftMargin = 20;
+  const rightMargin = 190;
+  const pageWidth = 210;
   
-  // Helper function for consistent text styling
-  const addText = (text: string, x: number, y: number, options: {
-    fontSize?: number;
-    fontStyle?: string;
-    color?: number[];
-    align?: string;
-  } = {}) => {
-    const { fontSize = 10, fontStyle = 'normal', color = [0, 0, 0], align = 'left' } = options;
-    doc.setTextColor(color[0], color[1], color[2]);
-    doc.setFontSize(fontSize);
-    doc.setFont('helvetica', fontStyle);
-    if (align === 'center') {
-      doc.text(text, x, y, { align: 'center' });
-    } else {
+  // Professional colors
+  const primaryBlue = [34, 67, 120];
+  const lightBlue = [70, 130, 180];
+  const darkGray = [64, 64, 64];
+  const mediumGray = [102, 102, 102];
+  
+  // Helper function for safe text addition
+  const addText = (text: string, x: number, y: number, options: any = {}) => {
+    const { fontSize = 10, fontStyle = 'normal', color = [0, 0, 0] } = options;
+    
+    try {
+      doc.setTextColor(color[0], color[1], color[2]);
+      doc.setFontSize(fontSize);
+      doc.setFont('helvetica', fontStyle);
+      
+      // Ensure text fits within page boundaries
+      const textWidth = doc.getTextWidth(text);
+      if (x + textWidth > rightMargin) {
+        const splitText = doc.splitTextToSize(text, rightMargin - x);
+        if (Array.isArray(splitText)) {
+          splitText.forEach((line: string, index: number) => {
+            doc.text(line, x, y + (index * 5));
+          });
+          return splitText.length * 5;
+        }
+      }
+      
       doc.text(text, x, y);
+      return 5;
+    } catch (error) {
+      console.error('Error adding text:', error);
+      return 5;
     }
   };
   
-  // Professional header section
+  let currentY = 20;
+  
+  // Professional header
   doc.setFillColor(34, 67, 120);
-  doc.rect(0, 0, 210, 45, 'F');
+  doc.rect(0, 0, pageWidth, 40, 'F');
   
-  // Name - Large and prominent
-  addText('JADIDYA', 105, 20, {
-    fontSize: 32,
-    fontStyle: 'bold',
-    color: [255, 255, 255],
-    align: 'center'
-  });
+  // Name
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(28);
+  doc.setFont('helvetica', 'bold');
+  doc.text('JADIDYA', pageWidth/2, 20, { align: 'center' });
   
-  // Professional title
-  addText('Full-Stack Developer', 105, 32, {
-    fontSize: 14,
-    fontStyle: 'normal',
-    color: [255, 255, 255],
-    align: 'center'
-  });
+  // Title
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Full-Stack Developer', pageWidth/2, 30, { align: 'center' });
   
-  // Contact information in header
-  addText('juntyhoney2015@gmail.com', 105, 40, {
-    fontSize: 10,
-    color: [255, 255, 255],
-    align: 'center'
-  });
+  currentY = 50;
   
-  let currentY = 55;
-  
-  // Contact details section
-  addText('CONTACT INFORMATION', 20, currentY, {
+  // Contact Information
+  addText('CONTACT INFORMATION', leftMargin, currentY, {
     fontSize: 12,
     fontStyle: 'bold',
     color: primaryBlue
   });
   
-  // Underline for section headers
   doc.setDrawColor(34, 67, 120);
-  doc.setLineWidth(1);
-  doc.line(20, currentY + 2, 85, currentY + 2);
+  doc.line(leftMargin, currentY + 2, 90, currentY + 2);
   
   currentY += 10;
-  addText('Phone: +91-7286820026', 20, currentY, { fontSize: 10, color: darkGray });
-  currentY += 5;
-  addText('Email: juntyhoney2015@gmail.com', 20, currentY, { fontSize: 10, color: darkGray });
-  currentY += 5;
-  addText('Location: India', 20, currentY, { fontSize: 10, color: darkGray });
+  addText('Email: juntyhoney2015@gmail.com', leftMargin, currentY, { color: darkGray });
+  currentY += 6;
+  addText('Phone: +91-7286820026', leftMargin, currentY, { color: darkGray });
+  currentY += 6;
+  addText('Location: India', leftMargin, currentY, { color: darkGray });
   
   currentY += 15;
   
   // Professional Summary
-  addText('PROFESSIONAL SUMMARY', 20, currentY, {
+  addText('PROFESSIONAL SUMMARY', leftMargin, currentY, {
     fontSize: 12,
     fontStyle: 'bold',
     color: primaryBlue
   });
-  doc.line(20, currentY + 2, 95, currentY + 2);
+  doc.line(leftMargin, currentY + 2, 100, currentY + 2);
   
   currentY += 10;
-  const summaryText = `Recent B.Tech Computer Science graduate with comprehensive expertise in full-stack web development. 
-Proficient in modern technologies including React.js, Node.js, Python, and database management systems. 
-Demonstrated ability to develop end-to-end web applications with focus on user experience and performance 
-optimization. Strong foundation in software engineering principles with practical project experience.`;
+  const summary = 'Recent B.Tech Computer Science graduate with expertise in full-stack development. Proficient in React.js, Node.js, Python, and modern web technologies. Strong foundation in software engineering with practical project experience.';
   
-  const summaryLines = doc.splitTextToSize(summaryText, 170);
-  summaryLines.forEach((line: string, index: number) => {
-    addText(line, 20, currentY + (index * 4), { fontSize: 10, color: darkGray });
+  const summaryLines = doc.splitTextToSize(summary, 170);
+  summaryLines.forEach((line: string) => {
+    addText(line, leftMargin, currentY, { color: darkGray });
+    currentY += 5;
   });
-  currentY += (summaryLines.length * 4) + 10;
   
-  // Technical Skills - ATS friendly format
-  addText('TECHNICAL SKILLS', 20, currentY, {
+  currentY += 10;
+  
+  // Technical Skills
+  addText('TECHNICAL SKILLS', leftMargin, currentY, {
     fontSize: 12,
     fontStyle: 'bold',
     color: primaryBlue
   });
-  doc.line(20, currentY + 2, 70, currentY + 2);
+  doc.line(leftMargin, currentY + 2, 75, currentY + 2);
   
   currentY += 10;
   
-  const skillCategories = [
-    {
-      category: 'Programming Languages:',
-      skills: 'JavaScript, TypeScript, Python, HTML5, CSS3'
-    },
-    {
-      category: 'Frontend Technologies:',
-      skills: 'React.js, Tailwind CSS, Responsive Design, Bootstrap'
-    },
-    {
-      category: 'Backend Technologies:',
-      skills: 'Node.js, Express.js, Django, FastAPI, RESTful APIs'
-    },
-    {
-      category: 'Databases:',
-      skills: 'MySQL, PostgreSQL, MongoDB, Database Design'
-    },
-    {
-      category: 'Tools & Platforms:',
-      skills: 'Git, GitHub, VS Code, Postman, npm, Docker'
-    },
-    {
-      category: 'Cloud & DevOps:',
-      skills: 'AWS (Basic), CI/CD Pipelines, Deployment Strategies'
-    }
+  const skills = [
+    'Programming: JavaScript, TypeScript, Python, HTML5, CSS3',
+    'Frontend: React.js, Tailwind CSS, Responsive Design',
+    'Backend: Node.js, Express.js, Django, RESTful APIs',
+    'Database: MySQL, PostgreSQL, MongoDB',
+    'Tools: Git, GitHub, VS Code, npm, Docker'
   ];
   
-  skillCategories.forEach(skill => {
-    addText(skill.category, 20, currentY, { fontSize: 10, fontStyle: 'bold', color: darkGray });
-    addText(skill.skills, 20, currentY + 4, { fontSize: 10, color: mediumGray });
-    currentY += 10;
+  skills.forEach(skill => {
+    addText(`• ${skill}`, leftMargin, currentY, { fontSize: 9, color: mediumGray });
+    currentY += 6;
   });
   
-  currentY += 5;
+  currentY += 10;
   
   // Education
-  addText('EDUCATION', 20, currentY, {
+  addText('EDUCATION', leftMargin, currentY, {
     fontSize: 12,
     fontStyle: 'bold',
     color: primaryBlue
   });
-  doc.line(20, currentY + 2, 50, currentY + 2);
+  doc.line(leftMargin, currentY + 2, 55, currentY + 2);
   
   currentY += 10;
-  addText('Bachelor of Technology - Computer Science Engineering', 20, currentY, {
+  addText('Bachelor of Technology - Computer Science Engineering (2024)', leftMargin, currentY, {
     fontSize: 11,
     fontStyle: 'bold',
     color: darkGray
   });
-  
-  addText('2024', 170, currentY, { fontSize: 10, color: mediumGray });
   currentY += 6;
-  
-  addText('Mallareddy College of Engineering', 20, currentY, {
+  addText('Mallareddy College of Engineering', leftMargin, currentY, {
     fontSize: 10,
-    fontStyle: 'italic',
     color: lightBlue
-  });
-  currentY += 6;
-  
-  addText('• Specialized in Software Engineering and Full-Stack Development', 25, currentY, {
-    fontSize: 9,
-    color: mediumGray
-  });
-  currentY += 4;
-  addText('• Strong foundation in Data Structures, Algorithms, and System Design', 25, currentY, {
-    fontSize: 9,
-    color: mediumGray
   });
   
   currentY += 15;
   
-  // Key Projects
-  addText('KEY PROJECTS', 20, currentY, {
+  // Projects
+  addText('KEY PROJECTS', leftMargin, currentY, {
     fontSize: 12,
     fontStyle: 'bold',
     color: primaryBlue
   });
-  doc.line(20, currentY + 2, 55, currentY + 2);
+  doc.line(leftMargin, currentY + 2, 60, currentY + 2);
   
   currentY += 10;
   
   const projects = [
     {
       name: 'E-commerce Web Application',
-      technologies: 'React.js, Node.js, Express.js, MongoDB, Payment Integration',
-      description: 'Developed full-stack e-commerce platform with user authentication, product catalog, shopping cart, and secure payment processing. Implemented responsive design and optimized performance.',
-      achievements: ['• User authentication and authorization system', '• Real-time inventory management', '• Secure payment gateway integration']
+      tech: 'React.js, Node.js, Express.js, MongoDB',
+      desc: 'Full-stack e-commerce platform with user authentication, product catalog, and payment processing.'
     },
     {
       name: 'Weather Dashboard Application',
-      technologies: 'React.js, TypeScript, REST APIs, Tailwind CSS',
-      description: 'Built responsive weather application with real-time data fetching, location-based services, and interactive user interface. Integrated third-party weather APIs.',
-      achievements: ['• Real-time weather data visualization', '• Location-based weather forecasting', '• Mobile-responsive design implementation']
+      tech: 'React.js, TypeScript, REST APIs, Tailwind CSS',
+      desc: 'Responsive weather application with real-time data and location-based services.'
     },
     {
       name: 'Task Management System',
-      technologies: 'React.js, Python, Django, PostgreSQL',
-      description: 'Created comprehensive project management tool with task tracking, team collaboration features, and progress monitoring. Implemented CRUD operations and user role management.',
-      achievements: ['• Multi-user collaboration system', '• Real-time task updates and notifications', '• Advanced filtering and search functionality']
+      tech: 'React.js, Python, Django, PostgreSQL',
+      desc: 'Project management tool with task tracking and team collaboration features.'
     }
   ];
   
   projects.forEach(project => {
-    addText(project.name, 20, currentY, {
+    addText(project.name, leftMargin, currentY, {
       fontSize: 11,
       fontStyle: 'bold',
       color: darkGray
     });
     currentY += 6;
     
-    addText(`Technologies: ${project.technologies}`, 20, currentY, {
+    addText(`Technologies: ${project.tech}`, leftMargin, currentY, {
       fontSize: 9,
-      fontStyle: 'italic',
       color: lightBlue
     });
     currentY += 5;
     
-    const descLines = doc.splitTextToSize(project.description, 170);
-    descLines.forEach((line: string, index: number) => {
-      addText(line, 20, currentY + (index * 4), { fontSize: 9, color: mediumGray });
-    });
-    currentY += (descLines.length * 4) + 2;
-    
-    project.achievements.forEach(achievement => {
-      addText(achievement, 20, currentY, { fontSize: 9, color: mediumGray });
+    const descLines = doc.splitTextToSize(project.desc, 170);
+    descLines.forEach((line: string) => {
+      addText(line, leftMargin, currentY, { fontSize: 9, color: mediumGray });
       currentY += 4;
     });
-    currentY += 6;
-  });
-  
-  // Certifications
-  addText('CERTIFICATIONS', 20, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
-  doc.line(20, currentY + 2, 70, currentY + 2);
-  
-  currentY += 10;
-  
-  const certifications = [
-    {
-      name: 'Python Complete Course For Python Beginners',
-      provider: 'Udemy',
-      year: '2024',
-      description: 'Comprehensive Python programming certification covering fundamentals, OOP, data structures, and practical applications.'
-    },
-    {
-      name: 'Python Full Stack Development',
-      provider: 'Professional Training Institute',
-      year: '2024',
-      description: 'Intensive full-stack development course covering Django, FastAPI, database integration, and deployment strategies.'
-    }
-  ];
-  
-  certifications.forEach(cert => {
-    addText(cert.name, 20, currentY, {
-      fontSize: 10,
-      fontStyle: 'bold',
-      color: darkGray
-    });
-    addText(cert.year, 170, currentY, { fontSize: 9, color: mediumGray });
-    currentY += 5;
-    
-    addText(cert.provider, 20, currentY, {
-      fontSize: 9,
-      fontStyle: 'italic',
-      color: lightBlue
-    });
-    currentY += 5;
-    
-    addText(cert.description, 20, currentY, { fontSize: 9, color: mediumGray });
     currentY += 8;
   });
   
-  // Professional Skills
-  currentY += 5;
-  addText('CORE COMPETENCIES', 20, currentY, {
+  // Certifications
+  addText('CERTIFICATIONS', leftMargin, currentY, {
     fontSize: 12,
     fontStyle: 'bold',
     color: primaryBlue
   });
-  doc.line(20, currentY + 2, 80, currentY + 2);
+  doc.line(leftMargin, currentY + 2, 70, currentY + 2);
   
   currentY += 10;
-  const competencies = [
-    'Problem Solving & Analytical Thinking',
-    'Full-Stack Web Development',
-    'Database Design & Optimization',
-    'API Development & Integration',
-    'Agile Development Methodology',
-    'Version Control & Collaboration',
-    'Performance Optimization',
-    'Responsive Web Design'
-  ];
-  
-  // Display competencies in two columns
-  competencies.forEach((comp, index) => {
-    const xPos = index % 2 === 0 ? 20 : 105;
-    const yPos = currentY + Math.floor(index / 2) * 5;
-    addText(`• ${comp}`, xPos, yPos, { fontSize: 9, color: mediumGray });
+  addText('• Python Complete Course For Python Beginners - Udemy (2024)', leftMargin, currentY, {
+    fontSize: 10,
+    color: darkGray
+  });
+  currentY += 6;
+  addText('• Python Full Stack Development - Professional Training (2024)', leftMargin, currentY, {
+    fontSize: 10,
+    color: darkGray
   });
   
-  // Professional footer
-  doc.setFillColor(34, 67, 120);
-  doc.rect(0, 285, 210, 12, 'F');
-  addText('ATS-Optimized Professional Resume | Ready for Technical Positions', 105, 292, {
-    fontSize: 8,
-    color: [255, 255, 255],
-    align: 'center'
-  });
-  
-  // Save the enhanced professional PDF
+  // Save the PDF
   doc.save('Jadidya_Professional_Resume.pdf');
 };
