@@ -23,231 +23,404 @@ export const downloadResume = async () => {
       return;
     }
 
-    // Generate professional PDF resume
-    generateProfessionalPDF();
+    // Generate comprehensive professional PDF resume
+    generateComprehensivePDF();
     
   } catch (error) {
     console.error('Download failed:', error);
-    generateProfessionalPDF();
+    generateComprehensivePDF();
   }
 };
 
-const generateProfessionalPDF = () => {
+const generateComprehensivePDF = () => {
   const doc = new jsPDF();
   
-  // Set page margins
+  // Page dimensions and margins
+  const pageWidth = 210;
+  const pageHeight = 297;
   const leftMargin = 20;
   const rightMargin = 190;
-  const pageWidth = 210;
+  const centerX = pageWidth / 2;
   
-  // Professional colors
-  const primaryBlue = [34, 67, 120];
-  const lightBlue = [70, 130, 180];
-  const darkGray = [64, 64, 64];
-  const mediumGray = [102, 102, 102];
+  // Professional color scheme
+  const colors = {
+    primary: [41, 128, 185],     // Professional blue
+    secondary: [52, 152, 219],   // Lighter blue
+    accent: [230, 126, 34],      // Orange accent
+    dark: [44, 62, 80],          // Dark blue-gray
+    gray: [127, 140, 141],       // Medium gray
+    lightGray: [236, 240, 241],  // Light gray
+    success: [39, 174, 96],      // Green
+    white: [255, 255, 255]
+  };
   
-  // Helper function for safe text addition
+  // Helper functions
+  const setColor = (color: number[]) => {
+    doc.setTextColor(color[0], color[1], color[2]);
+  };
+  
+  const setFillColor = (color: number[]) => {
+    doc.setFillColor(color[0], color[1], color[2]);
+  };
+  
   const addText = (text: string, x: number, y: number, options: any = {}) => {
-    const { fontSize = 10, fontStyle = 'normal', color = [0, 0, 0] } = options;
+    const { 
+      fontSize = 10, 
+      fontStyle = 'normal', 
+      color = colors.dark, 
+      align = 'left',
+      maxWidth = rightMargin - leftMargin 
+    } = options;
     
     try {
-      doc.setTextColor(color[0], color[1], color[2]);
+      setColor(color);
       doc.setFontSize(fontSize);
       doc.setFont('helvetica', fontStyle);
       
-      // Ensure text fits within page boundaries
-      const textWidth = doc.getTextWidth(text);
-      if (x + textWidth > rightMargin) {
-        const splitText = doc.splitTextToSize(text, rightMargin - x);
+      if (maxWidth && doc.getTextWidth(text) > maxWidth) {
+        const splitText = doc.splitTextToSize(text, maxWidth);
         if (Array.isArray(splitText)) {
           splitText.forEach((line: string, index: number) => {
-            doc.text(line, x, y + (index * 5));
+            doc.text(line, x, y + (index * (fontSize * 0.4)), { align });
           });
-          return splitText.length * 5;
+          return splitText.length * (fontSize * 0.4);
         }
       }
       
-      doc.text(text, x, y);
-      return 5;
+      doc.text(text, x, y, { align });
+      return fontSize * 0.4;
     } catch (error) {
       console.error('Error adding text:', error);
-      return 5;
+      return fontSize * 0.4;
     }
+  };
+  
+  const addSection = (title: string, y: number, color = colors.primary) => {
+    // Section background
+    setFillColor([...color, 0.1]);
+    doc.rect(leftMargin - 5, y - 8, rightMargin - leftMargin + 10, 12, 'F');
+    
+    // Section title
+    setColor(color);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title.toUpperCase(), leftMargin, y);
+    
+    // Decorative line
+    doc.setDrawColor(color[0], color[1], color[2]);
+    doc.setLineWidth(2);
+    doc.line(leftMargin, y + 2, leftMargin + 60, y + 2);
+    
+    return y + 15;
   };
   
   let currentY = 20;
   
-  // Professional header
-  doc.setFillColor(34, 67, 120);
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  // HEADER SECTION - Enhanced Design
+  setFillColor(colors.primary);
+  doc.rect(0, 0, pageWidth, 55, 'F');
   
-  // Name
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
+  // Decorative elements
+  setFillColor(colors.secondary);
+  doc.circle(pageWidth - 30, 25, 20, 'F');
+  setFillColor(colors.accent);
+  doc.circle(25, 25, 15, 'F');
+  
+  // Name with enhanced styling
+  setColor(colors.white);
+  doc.setFontSize(36);
   doc.setFont('helvetica', 'bold');
-  doc.text('JADIDYA', pageWidth/2, 20, { align: 'center' });
+  doc.text('JADIDYA', centerX, 25, { align: 'center' });
   
-  // Title
-  doc.setFontSize(14);
+  // Professional title with accent
+  doc.setFontSize(16);
   doc.setFont('helvetica', 'normal');
-  doc.text('Full-Stack Developer', pageWidth/2, 30, { align: 'center' });
+  doc.text('Full-Stack Developer & Software Engineer', centerX, 35, { align: 'center' });
   
-  currentY = 50;
+  // Contact bar
+  setFillColor([...colors.white, 0.9]);
+  doc.rect(0, 45, pageWidth, 10, 'F');
   
-  // Contact Information
-  addText('CONTACT INFORMATION', leftMargin, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
+  setColor(colors.dark);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  const contactInfo = 'juntyhoney2015@gmail.com | +91-7286820026 | India | linkedin.com/in/jadidya';
+  doc.text(contactInfo, centerX, 51, { align: 'center' });
   
-  doc.setDrawColor(34, 67, 120);
-  doc.line(leftMargin, currentY + 2, 90, currentY + 2);
+  currentY = 70;
   
-  currentY += 10;
-  addText('Email: juntyhoney2015@gmail.com', leftMargin, currentY, { color: darkGray });
-  currentY += 6;
-  addText('Phone: +91-7286820026', leftMargin, currentY, { color: darkGray });
-  currentY += 6;
-  addText('Location: India', leftMargin, currentY, { color: darkGray });
+  // PROFESSIONAL SUMMARY - Enhanced
+  currentY = addSection('Professional Summary', currentY, colors.primary);
   
-  currentY += 15;
+  const summaryText = 'Recent B.Tech Computer Science Engineering graduate (2024) with comprehensive expertise in full-stack web development. Proficient in modern JavaScript frameworks (React.js), backend technologies (Node.js, Python, Django), and database management systems. Demonstrated ability to develop scalable web applications with clean, maintainable code. Strong foundation in software engineering principles, data structures, algorithms, and system design. Passionate about creating innovative solutions and staying current with emerging technologies.';
   
-  // Professional Summary
-  addText('PROFESSIONAL SUMMARY', leftMargin, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
-  doc.line(leftMargin, currentY + 2, 100, currentY + 2);
-  
-  currentY += 10;
-  const summary = 'Recent B.Tech Computer Science graduate with expertise in full-stack development. Proficient in React.js, Node.js, Python, and modern web technologies. Strong foundation in software engineering with practical project experience.';
-  
-  const summaryLines = doc.splitTextToSize(summary, 170);
-  summaryLines.forEach((line: string) => {
-    addText(line, leftMargin, currentY, { color: darkGray });
-    currentY += 5;
-  });
+  currentY += addText(summaryText, leftMargin, currentY, {
+    fontSize: 11,
+    color: colors.dark,
+    maxWidth: rightMargin - leftMargin
+  }) + 5;
   
   currentY += 10;
   
-  // Technical Skills
-  addText('TECHNICAL SKILLS', leftMargin, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
-  doc.line(leftMargin, currentY + 2, 75, currentY + 2);
+  // TECHNICAL SKILLS - Enhanced with categories
+  currentY = addSection('Technical Expertise', currentY, colors.secondary);
   
-  currentY += 10;
-  
-  const skills = [
-    'Programming: JavaScript, TypeScript, Python, HTML5, CSS3',
-    'Frontend: React.js, Tailwind CSS, Responsive Design',
-    'Backend: Node.js, Express.js, Django, RESTful APIs',
-    'Database: MySQL, PostgreSQL, MongoDB',
-    'Tools: Git, GitHub, VS Code, npm, Docker'
+  const skillCategories = [
+    {
+      category: 'Programming Languages',
+      skills: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML5', 'CSS3', 'SQL'],
+      color: colors.primary
+    },
+    {
+      category: 'Frontend Development',
+      skills: ['React.js', 'Tailwind CSS', 'Responsive Design', 'RESTful API Integration', 'State Management'],
+      color: colors.secondary
+    },
+    {
+      category: 'Backend Development',
+      skills: ['Node.js', 'Express.js', 'Django', 'FastAPI', 'RESTful APIs', 'Authentication'],
+      color: colors.accent
+    },
+    {
+      category: 'Database Technologies',
+      skills: ['MySQL', 'PostgreSQL', 'MongoDB', 'Database Design', 'Query Optimization'],
+      color: colors.success
+    },
+    {
+      category: 'Development Tools',
+      skills: ['Git & GitHub', 'VS Code', 'npm/yarn', 'Docker', 'Postman', 'Chrome DevTools'],
+      color: colors.gray
+    }
   ];
   
-  skills.forEach(skill => {
-    addText(`• ${skill}`, leftMargin, currentY, { fontSize: 9, color: mediumGray });
+  skillCategories.forEach((category, index) => {
+    // Category title
+    setColor(category.color);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`• ${category.category}:`, leftMargin, currentY);
     currentY += 6;
+    
+    // Skills
+    setColor(colors.dark);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const skillsText = category.skills.join(' • ');
+    currentY += addText(skillsText, leftMargin + 10, currentY, {
+      fontSize: 10,
+      maxWidth: rightMargin - leftMargin - 10
+    }) + 3;
   });
   
   currentY += 10;
   
-  // Education
-  addText('EDUCATION', leftMargin, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
-  doc.line(leftMargin, currentY + 2, 55, currentY + 2);
+  // EDUCATION - Enhanced
+  currentY = addSection('Education', currentY, colors.accent);
   
-  currentY += 10;
-  addText('Bachelor of Technology - Computer Science Engineering (2024)', leftMargin, currentY, {
-    fontSize: 11,
-    fontStyle: 'bold',
-    color: darkGray
-  });
+  // Education background box
+  setFillColor([...colors.lightGray, 0.3]);
+  doc.rect(leftMargin - 2, currentY - 2, rightMargin - leftMargin + 4, 25, 'F');
+  
+  // Degree
+  setColor(colors.dark);
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Bachelor of Technology - Computer Science Engineering', leftMargin, currentY);
+  currentY += 7;
+  
+  // Institution
+  setColor(colors.primary);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Mallareddy College of Engineering', leftMargin, currentY);
   currentY += 6;
-  addText('Mallareddy College of Engineering', leftMargin, currentY, {
-    fontSize: 10,
-    color: lightBlue
-  });
   
+  // Year and achievement
+  setColor(colors.gray);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Graduated: 2024 | Specialization: Full-Stack Development', leftMargin, currentY);
+  currentY += 8;
+  
+  // Key coursework
+  setColor(colors.dark);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Key Coursework: Data Structures & Algorithms, Software Engineering, Database Systems, Web Technologies', leftMargin, currentY);
   currentY += 15;
   
-  // Projects
-  addText('KEY PROJECTS', leftMargin, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
-  doc.line(leftMargin, currentY + 2, 60, currentY + 2);
-  
-  currentY += 10;
+  // KEY PROJECTS - Enhanced with detailed descriptions
+  currentY = addSection('Key Projects & Portfolio', currentY, colors.success);
   
   const projects = [
     {
       name: 'E-commerce Web Application',
-      tech: 'React.js, Node.js, Express.js, MongoDB',
-      desc: 'Full-stack e-commerce platform with user authentication, product catalog, and payment processing.'
+      tech: 'React.js, Node.js, Express.js, MongoDB, Stripe API',
+      description: 'Comprehensive full-stack e-commerce platform featuring user authentication, product catalog with search and filtering, shopping cart functionality, secure payment processing via Stripe, admin dashboard for inventory management, and responsive design. Implemented JWT authentication, bcrypt password hashing, and RESTful API architecture.',
+      highlights: ['Payment Integration', 'Admin Dashboard', 'Real-time Updates', 'Mobile Responsive'],
+      color: colors.primary
     },
     {
       name: 'Weather Dashboard Application',
-      tech: 'React.js, TypeScript, REST APIs, Tailwind CSS',
-      desc: 'Responsive weather application with real-time data and location-based services.'
+      tech: 'React.js, TypeScript, OpenWeather API, Tailwind CSS',
+      description: 'Interactive weather application providing real-time weather data, 5-day forecasts, location-based services with geolocation API, weather maps integration, and local storage for favorite locations. Features responsive design, error handling, and optimized API calls with caching mechanisms.',
+      highlights: ['Real-time Data', 'Geolocation', 'Data Visualization', 'Performance Optimized'],
+      color: colors.secondary
     },
     {
       name: 'Task Management System',
-      tech: 'React.js, Python, Django, PostgreSQL',
-      desc: 'Project management tool with task tracking and team collaboration features.'
+      tech: 'React.js, Python, Django REST Framework, PostgreSQL',
+      description: 'Professional project management tool with task creation, assignment, and tracking capabilities. Features include team collaboration, project timelines, progress tracking, file attachments, email notifications, and comprehensive reporting. Implemented role-based access control and real-time updates.',
+      highlights: ['Team Collaboration', 'Role-based Access', 'File Management', 'Reporting'],
+      color: colors.accent
     }
   ];
   
-  projects.forEach(project => {
-    addText(project.name, leftMargin, currentY, {
-      fontSize: 11,
-      fontStyle: 'bold',
-      color: darkGray
-    });
+  projects.forEach((project, index) => {
+    // Check if we need a new page
+    if (currentY > pageHeight - 60) {
+      doc.addPage();
+      currentY = 30;
+    }
+    
+    // Project container
+    setFillColor([...project.color, 0.05]);
+    doc.rect(leftMargin - 3, currentY - 3, rightMargin - leftMargin + 6, 45, 'F');
+    
+    // Project name
+    setColor(project.color);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(project.name, leftMargin, currentY);
+    currentY += 7;
+    
+    // Technologies
+    setColor(colors.gray);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Technologies: ', leftMargin, currentY);
+    
+    setColor(project.color);
+    doc.setFont('helvetica', 'normal');
+    doc.text(project.tech, leftMargin + 25, currentY);
     currentY += 6;
     
-    addText(`Technologies: ${project.tech}`, leftMargin, currentY, {
-      fontSize: 9,
-      color: lightBlue
-    });
-    currentY += 5;
+    // Description
+    setColor(colors.dark);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    currentY += addText(project.description, leftMargin, currentY, {
+      fontSize: 10,
+      maxWidth: rightMargin - leftMargin
+    }) + 3;
     
-    const descLines = doc.splitTextToSize(project.desc, 170);
-    descLines.forEach((line: string) => {
-      addText(line, leftMargin, currentY, { fontSize: 9, color: mediumGray });
-      currentY += 4;
-    });
-    currentY += 8;
+    // Key highlights
+    setColor(colors.success);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Key Features: ', leftMargin, currentY);
+    
+    setColor(colors.dark);
+    doc.setFont('helvetica', 'normal');
+    doc.text(project.highlights.join(' • '), leftMargin + 25, currentY);
+    currentY += 15;
   });
   
-  // Certifications
-  addText('CERTIFICATIONS', leftMargin, currentY, {
-    fontSize: 12,
-    fontStyle: 'bold',
-    color: primaryBlue
-  });
-  doc.line(leftMargin, currentY + 2, 70, currentY + 2);
+  // Check if we need a new page for certifications
+  if (currentY > pageHeight - 50) {
+    doc.addPage();
+    currentY = 30;
+  }
   
-  currentY += 10;
-  addText('• Python Complete Course For Python Beginners - Udemy (2024)', leftMargin, currentY, {
-    fontSize: 10,
-    color: darkGray
-  });
-  currentY += 6;
-  addText('• Python Full Stack Development - Professional Training (2024)', leftMargin, currentY, {
-    fontSize: 10,
-    color: darkGray
+  // CERTIFICATIONS - Enhanced
+  currentY = addSection('Professional Certifications', currentY, colors.primary);
+  
+  const certifications = [
+    {
+      title: 'Python Complete Course For Python Beginners',
+      provider: 'Udemy',
+      year: '2024',
+      description: 'Comprehensive Python programming certification covering fundamentals, OOP, data structures, file handling, error handling, and practical project development.',
+      skills: ['Python Fundamentals', 'Object-Oriented Programming', 'Data Structures', 'File I/O', 'Exception Handling', 'Project Development']
+    },
+    {
+      title: 'Python Full Stack Development - Professional Training',
+      provider: 'Intensive Offline Course',
+      year: '2024',
+      description: 'Advanced full-stack development training with Django, FastAPI, database integration, deployment strategies, and production-level application development.',
+      skills: ['Django Framework', 'FastAPI', 'Database Integration', 'API Development', 'Deployment', 'Production Best Practices']
+    }
+  ];
+  
+  certifications.forEach((cert, index) => {
+    // Certification container
+    setFillColor([...colors.primary, 0.05]);
+    doc.rect(leftMargin - 2, currentY - 2, rightMargin - leftMargin + 4, 35, 'F');
+    
+    // Certification title
+    setColor(colors.primary);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(cert.title, leftMargin, currentY);
+    currentY += 6;
+    
+    // Provider and year
+    setColor(colors.accent);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${cert.provider} - ${cert.year}`, leftMargin, currentY);
+    currentY += 6;
+    
+    // Description
+    setColor(colors.dark);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    currentY += addText(cert.description, leftMargin, currentY, {
+      fontSize: 9,
+      maxWidth: rightMargin - leftMargin
+    }) + 3;
+    
+    // Skills covered
+    setColor(colors.gray);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.text(`Skills: ${cert.skills.join(' • ')}`, leftMargin, currentY);
+    currentY += 20;
   });
   
-  // Save the PDF
-  doc.save('Jadidya_Professional_Resume.pdf');
+  // ADDITIONAL SECTIONS
+  currentY += 5;
+  
+  // Professional Attributes
+  currentY = addSection('Professional Attributes', currentY, colors.success);
+  
+  const attributes = [
+    'Strong problem-solving and analytical thinking skills',
+    'Excellent communication and team collaboration abilities',
+    'Self-motivated with continuous learning mindset',
+    'Attention to detail and commitment to code quality',
+    'Adaptable to new technologies and methodologies',
+    'Project management and time management skills'
+  ];
+  
+  attributes.forEach(attribute => {
+    setColor(colors.dark);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`• ${attribute}`, leftMargin, currentY);
+    currentY += 5;
+  });
+  
+  // Footer with design elements
+  const footerY = pageHeight - 20;
+  setFillColor(colors.primary);
+  doc.rect(0, footerY - 5, pageWidth, 25, 'F');
+  
+  setColor(colors.white);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Thank you for considering my application. I look forward to contributing to your team!', centerX, footerY + 5, { align: 'center' });
+  
+  // Save the comprehensive PDF
+  doc.save('Jadidya_Professional_Resume_Complete.pdf');
 };
